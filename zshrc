@@ -55,7 +55,8 @@ export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
 export MANPATH="/usr/local/man:$MANPATH"
 
 # ZSH syntax highlighting
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+test -e /usr/local/share/zsh-syntax-highlighting/zsh-syntax-hihglighting.zsh && source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+test -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlihgting.zsh
 
 # You may need to manually set your language environment
 export LANG=en_GB.UTF-8
@@ -116,4 +117,4 @@ export CLICOLOR=true
 export CLICOLOR_FORCE=true
 export LSCOLORS='dxfxcxdxbxegedabagacad'
 
-#test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
+test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
