@@ -45,8 +45,7 @@ COMPLETION_WAITING_DOTS="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(ssh-agent sudo git git-flow brew)
-zstyle :omz:plugins:ssh-agent identities id_lease
+plugins=(sudo git git-flow brew)
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
