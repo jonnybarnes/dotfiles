@@ -56,7 +56,7 @@ export MANPATH="/usr/local/man:$MANPATH"
 
 # ZSH syntax highlighting
 test -e /usr/local/share/zsh-syntax-highlighting/zsh-syntax-hihglighting.zsh && source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-test -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlihgting.zsh
+test -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # You may need to manually set your language environment
 export LANG=en_GB.UTF-8
