@@ -50,29 +50,29 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
+# Determine the running OS
+platform="unkown"
+unamestr=$(uname -s)
+if [[ "$unamestr" == 'Linux' ]]; then
+    platform="linux"
+elif [[ "$unamestr" == 'Darwin' ]]; then
+    platform="osx"
+fi
+
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
 export MANPATH="/usr/local/man:$MANPATH"
 
 # ZSH syntax highlighting
-test -e /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh && source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-test -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+test -e /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
+&& source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+test -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
+&& source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # You may need to manually set your language environment
 export LANG=en_GB.UTF-8
 
 # Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
 export EDITOR='vim'
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# ssh
-# export SSH_KEY_PATH="~/.ssh/dsa_id"
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -82,11 +82,14 @@ export EDITOR='vim'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+alias auao="sudo apt update && apt list --upgradable"
+alias aupg="sudo apt upgrade"
 alias aurup="sudo aura -Akua"
 alias brewcurl="/usr/local/opt/curl/bin/curl"
 alias brewssl="/usr/local/opt/openssl/bin/openssl"
 alias irc="ssh lease -t '. ~/.zshrc; tmux attach -t irc'"
-alias ls="ls -FG --color=always"
+test "$platform" = 'linux' && alias ls="ls -F --color=always"
+test "$platform" = 'osx' && alias ls="ls -FG"
 alias phpunit="phpdbg -qrr vendor/bin/phpunit"
 alias pipup="pip3 freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip3 install -U"
 alias startace="acestreamengine --client-console --upload-limit 0 --download-limit 0"
@@ -106,7 +109,8 @@ GPG_TTY=`tty`
 export GPG_TTY
 
 # composer global
-export PATH="$PATH:/Users/jonny/.composer/vendor/bin"
+test "$platform" = 'linux' && export PATH="$PATH:/home/jonny/.composer/vendor/bin"
+test "$platform" = 'osx' && export PATH="$PATH:/Users/jonny/.composer/vendor/bin"
 
 # Set the DEFAULT_USER variable to me (jonny)
 export DEFAULT_USER="jonny"
