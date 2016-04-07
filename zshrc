@@ -50,6 +50,9 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
+# Source the untracked `extra` file
+test -e $HOME/.extra && source $HOME/.extra
+
 # Determine the running OS
 platform="unkown"
 unamestr=$(uname -s)
