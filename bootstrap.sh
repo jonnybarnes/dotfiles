@@ -5,6 +5,7 @@ BASEDIR=$(pwd)
 
 # ln the various files
 test -L $HOME/.curlrc || ln -f -s $BASEDIR/curlrc $HOME/.curlrc
+test -L $HOME/.gitignore || ln -f -s $BASEDIR/gitignore $HOME/.gitignore
 test -L $HOME/.hushlogin || ln -f -s $BASEDIR/hushlogin $HOME/.hushlogin
 test -L $HOME/.zshrc || ln -f -s $BASEDIR/zshrc $HOME/.zshrc
 
