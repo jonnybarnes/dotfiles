@@ -96,6 +96,7 @@ test "$platform" = 'osx' && alias ls="ls -FG"
 alias phpunit="phpdbg -qrr vendor/bin/phpunit"
 test "$platform" = 'linux' && alias pipup="pip freeze --local | grep -v '^\-e' | cut -d = -f 1 | xargs -n1 sudo pip install -U"
 test "$platform" = 'osx' && alias pipup="pip3 freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip3 install -U"
+alias rtor="tmux attach -t rtor"
 alias startace="acestreamengine --client-console --upload-limit 0 --download-limit 0"
 alias up="sudo pacman -Syu"
 
