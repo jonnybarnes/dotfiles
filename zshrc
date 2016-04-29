@@ -120,6 +120,9 @@ test "$platform" = 'osx' && export PATH="$PATH:/Users/jonny/.composer/vendor/bin
 # Set the DEFAULT_USER variable to me (jonny)
 export DEFAULT_USER="jonny"
 
+# No Homebrew analytics
+export HOMEBREW_NO_ANALYTICS=1
+
 # Colourised output for `ls`
 export CLICOLOR=true
 export CLICOLOR_FORCE=true
