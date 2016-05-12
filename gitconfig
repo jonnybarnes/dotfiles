@@ -12,6 +12,14 @@
     # Detect whitespace errors when applying a patch
     whitespace = fix
 
+[color "diff-highlight"]
+
+    # Colours for `diff-so-fancy`
+    oldNormal = "red bold"
+    oldHighlight = "red bold 52"
+    newNormal = "green bold"
+    newHighlight = "green bold 22"
+
 [filter "lfs"]
 
     # git-lfs stuff
@@ -28,3 +36,9 @@
 
     # Automatically correct typos in commands
     autocorrect = 1
+
+[pager]
+
+    # Make diff-so-fancy apply all the time
+    diff = "diff-so-fancy | less --tabs=4 -RFX"
+    show = "diff-so-fancy | less --tabs=4 -RFX"
