@@ -27,6 +27,7 @@ brew install homebrew/dupes/openssh
 brew install ack
 brew install git
 brew install git-lfs
+brew install diff-so-fancy
 brew install imagemagick --with-webp
 brew install lua
 brew install lynx
