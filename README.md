@@ -1,7 +1,7 @@
 # dotfiles
 
 Here’s my dotfiles, inspired by people like Mathias. See his dotfiles at
-`[https://github.com/mathias/dotfiles](https://github.com/mathias/dotfiles)`.
+[`https://github.com/mathias/dotfiles`](https://github.com/mathias/dotfiles).
 
 The idea I’m currently going down is to create a symlink from `$HOME` to this
 directory. There is one exception to this, the `.gitconfig` file. This derives
@@ -15,5 +15,5 @@ be in a dirty state, permanently.
 ## Usage
 
 First clone the repo. Then run `./boostrap.sh`, this will create all the
-necessary symlinks. This is a *destructive* process, so backup your dotfiles
+necessary symlinks. This is a **destructive** process, so backup your dotfiles
 first.
