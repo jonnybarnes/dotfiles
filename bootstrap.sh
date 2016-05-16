@@ -10,6 +10,7 @@ git submodule init && git submodule update
 test -L $HOME/.curlrc || ln -f -s $BASEDIR/curlrc $HOME/.curlrc
 test -L $HOME/.gitignore || ln -f -s $BASEDIR/gitignore $HOME/.gitignore
 test -L $HOME/.hushlogin || ln -f -s $BASEDIR/hushlogin $HOME/.hushlogin
+test -L $HOME/.ncmpcpp/config || ln -f -s $BASEDIR/ncmpcpp $HOME/.ncmpcpp/config
 test -L $HOME/.zshrc || ln -f -s $BASEDIR/zshrc $HOME/.zshrc
 
 # ln vim files
