@@ -23,6 +23,11 @@ brew install vim --override-system-vi
 brew install homebrew/dupes/grep
 brew install homebrew/dupes/openssh
 
+# Install zsh and addons
+brew install zsh
+brew install zsh-completions
+brew install zsh-syntax-highlighting
+
 # Install other useful utilities
 brew install ack
 brew install git
