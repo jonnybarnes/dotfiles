@@ -85,6 +85,9 @@ defaults write com.apple.dock autohide-time-modifier -float 0
 # Automatically hide and show the Dock
 defaults write com.apple.dock autohide -bool true
 
+# Automatically hide the menu bar
+defaults write NSGlobalDomain _HIHideMenuBar -bool true
+
 ## Safari and Webkit
 # Privacy: don’t send search queries to Apple
 defaults write com.apple.Safari UniversalSearchEnabled -bool false
