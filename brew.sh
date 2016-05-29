@@ -1,6 +1,10 @@
 #!/usr/bin/env zsh
 
 # Install Homebrew stuff
+brew tap homebrew/dupes
+brew tap homebrew/php
+brew tap homebrew/services
+brew tap tldr-pages/tldr
 
 # update brew, and upgrade already installed formulae
 brew update
