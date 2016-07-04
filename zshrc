@@ -49,6 +49,11 @@ plugins=(sudo git git-flow brew)
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
+# history
+SAVEHIST=100000
+
+# vim binddings
+bindkey -v
 
 # Source the untracked `extra` file
 test -e $HOME/.extra && source $HOME/.extra
@@ -70,6 +75,27 @@ test -e /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
 && source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 test -e /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
 && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# ZSH history substring search
+bindKeysZshHistoryOSX() {
+    zmodload zsh/terminfo
+    bindkey "$terminfo[kcuu1]" history-substring-search-up
+    bindkey "$terminfo[kcud1]" history-substring-search-down
+}
+
+bindKeysZshHistoryLinux() {
+    zmodload zsh/terminfo
+    bindkey "$terminfo[cuu1]" history-substring-search-up
+    bindkey "$terminfo[cud1]" history-substring-search-down
+}
+
+test -e /usr/local/opt/zsh-history-substring-search/zsh-history-substring-search.zsh \
+&& source /usr/local/opt/zsh-history-substring-search/zsh-history-substring-search.zsh
+test -e /usr/opt/zsh-history-substring-search/zsh-history-substring-search.zsh \
+&& source /usr/opt/zsh-history-substring-search/zsh-history-substring-search.zsh
+
+test "$platform" = 'osx' && bindKeysZshHistoryOSX
+test "$platform" = 'linux' && bindKeysZshHistoryLinux
 
 # You may need to manually set your language environment
 export LANG=en_GB.UTF-8
