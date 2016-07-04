@@ -82,18 +82,15 @@ bindKeysZshHistoryOSX() {
     bindkey "$terminfo[kcuu1]" history-substring-search-up
     bindkey "$terminfo[kcud1]" history-substring-search-down
 }
-
 bindKeysZshHistoryLinux() {
     zmodload zsh/terminfo
     bindkey "$terminfo[cuu1]" history-substring-search-up
     bindkey "$terminfo[cud1]" history-substring-search-down
 }
-
 test -e /usr/local/opt/zsh-history-substring-search/zsh-history-substring-search.zsh \
 && source /usr/local/opt/zsh-history-substring-search/zsh-history-substring-search.zsh
 test -e /usr/opt/zsh-history-substring-search/zsh-history-substring-search.zsh \
 && source /usr/opt/zsh-history-substring-search/zsh-history-substring-search.zsh
-
 test "$platform" = 'osx' && bindKeysZshHistoryOSX
 test "$platform" = 'linux' && bindKeysZshHistoryLinux
 
@@ -135,7 +132,16 @@ alias up="sudo pacman -Syu"
 # Brew ZSH stuff
 #unalias run-help
 #autoload run-help
-#HELPDIR=/usr/local/share/zsh/hel
+#HELPDIR=/usr/local/share/zsh/help
+
+# credit Paul Irish: https://github.com/paulirish/dotfiles/blob/606d85f083eb53853789ce9dcaf31a49756471bd/.zshrc#L80
+# Automatically list directory contents on `cd`.
+auto-ls () {
+	emulate -L zsh;
+	# explicit sexy ls'ing as aliases arent honored in here.
+	hash gls >/dev/null 2>&1 && CLICOLOR_FORCE=1 gls -aFh --color --group-directories-first || ls
+}
+chpwd_functions=( auto-ls $chpwd_functions )
 
 # Go Lang stuff
 export GOPATH=$HOME/Development/go
