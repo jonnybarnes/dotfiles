@@ -97,6 +97,12 @@ test -e /usr/opt/zsh-history-substring-search/zsh-history-substring-search.zsh \
 test "$platform" = 'osx' && bindKeysZshHistoryOSX
 test "$platform" = 'linux' && bindKeysZshHistoryLinux
 
+# ZSH autosuggestions
+test -e /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh \
+&& source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+test -e /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh \
+&& source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
 # You may need to manually set your language environment
 export LANG=en_GB.UTF-8
 
