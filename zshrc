@@ -117,7 +117,7 @@ export EDITOR='vim'
 alias auao="sudo apt update && apt list --upgradable"
 alias aupg="sudo apt upgrade"
 alias aurup="sudo aura -Akua"
-alias brewcurl="/usr/local/opt/curl/bin/curl"
+alias brewcurl="/usr/local/opt/curl/bin/curl --cacert /usr/local/etc/openssl/cert.pem"
 alias brewssl="/usr/local/opt/openssl/bin/openssl"
 alias irc="ssh lease -t '. ~/.zshrc; tmux attach -t irc'"
 test "$platform" = 'linux' && alias ls="ls -F --color=always"
