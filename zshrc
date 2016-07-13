@@ -137,9 +137,9 @@ alias up="sudo pacman -Syu"
 # credit Paul Irish: https://github.com/paulirish/dotfiles/blob/606d85f083eb53853789ce9dcaf31a49756471bd/.zshrc#L80
 # Automatically list directory contents on `cd`.
 auto-ls () {
-	emulate -L zsh;
-	# explicit sexy ls'ing as aliases arent honored in here.
-	hash gls >/dev/null 2>&1 && CLICOLOR_FORCE=1 gls -aFh --color --group-directories-first || ls
+    emulate -L zsh;
+    # explicit sexy ls'ing as aliases arent honored in here.
+    hash gls >/dev/null 2>&1 && CLICOLOR_FORCE=1 gls -aFh --color --group-directories-first || ls
 }
 chpwd_functions=( auto-ls $chpwd_functions )
 
