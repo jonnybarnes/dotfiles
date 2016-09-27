@@ -151,6 +151,13 @@ export PATH="$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin"
 GPG_TTY=`tty`
 export GPG_TTY
 
+# SSH
+if test -z "$SSH_AUTH_SOCK"; then
+    eval `ssh-agent -s`
+    ssh-add ~/.ssh/id_jmb
+    ssh-add ~/.ssh/id_github
+fi
+
 # composer global
 test "$platform" = 'linux' && export PATH="$PATH:/home/jonny/.composer/vendor/bin"
 test "$platform" = 'osx' && export PATH="$PATH:/Users/jonny/.composer/vendor/bin"
