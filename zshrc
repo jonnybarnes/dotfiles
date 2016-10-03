@@ -45,7 +45,7 @@ COMPLETION_WAITING_DOTS="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(sudo git git-flow brew)
+plugins=(git git-flow)
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
@@ -117,6 +117,8 @@ export EDITOR='vim'
 alias auao="sudo apt update && apt list --upgradable"
 alias aupg="sudo apt upgrade"
 alias aurup="sudo aura -Akua"
+alias bubc="brew upgrade && brew cleanup"
+alias bubo="brew update && brew outdated"
 alias brewcurl="/usr/local/opt/curl/bin/curl --cacert /usr/local/etc/openssl/cert.pem"
 alias brewssl="/usr/local/opt/openssl/bin/openssl"
 alias irc="ssh jmb -t '. ~/.zshrc; tmux attach -t irc'"
@@ -150,13 +152,6 @@ export PATH="$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin"
 # GnuPG stuff
 GPG_TTY=`tty`
 export GPG_TTY
-
-# SSH
-if test -z "$SSH_AUTH_SOCK"; then
-    eval `ssh-agent -s`
-    ssh-add ~/.ssh/id_jmb
-    ssh-add ~/.ssh/id_github
-fi
 
 # composer global
 test "$platform" = 'linux' && export PATH="$PATH:/home/jonny/.composer/vendor/bin"
