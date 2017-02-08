@@ -160,6 +160,9 @@ test "$platform" = 'osx' && export PATH="$PATH:/Users/jonny/.composer/vendor/bin
 # yarn PATH
 export PATH="$PATH:$HOME/.yarn/bin"
 
+# rust/cargo bin PATH
+export PATH="$PATH:$HOME/.cargo/bin"
+
 # Set the DEFAULT_USER variable to me (jonny)
 export DEFAULT_USER="jonny"
 
