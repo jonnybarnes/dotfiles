@@ -58,6 +58,11 @@ bindkey -v
 # Source the untracked `extra` file
 test -e $HOME/.extra && source $HOME/.extra
 
+# Source VTE for Terminix
+if [ $TERMINIX_ID ] || [ $VTE_VERSION ]; then
+        source /etc/profile.d/vte.sh
+fi
+
 # Determine the running OS
 platform="unkown"
 unamestr=$(uname -s)
