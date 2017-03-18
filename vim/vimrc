@@ -144,10 +144,10 @@ set expandtab
 
 " Force the cursor onto a new line after 80 characters
 set textwidth=80
-set colorcolumn=81
 " However, in Git commit messages, let’s make it 72 characters
 autocmd FileType gitcommit set textwidth=72
-autocmd FileType gitcommit set colorcolumn=73
+" Colour the 81st (or 73rd) column so that we don’t type over our limit
+set colorcolumn=+1
 
 "------------------------------------------------------------
 " Mappings {{{1
