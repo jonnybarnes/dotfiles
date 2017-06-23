@@ -172,6 +172,9 @@ export PATH="$PATH:$HOME/.yarn/bin"
 # rust/cargo bin PATH
 export PATH="$PATH:$HOME/.cargo/bin"
 
+# Ruby PATH
+export PATH="$PATH:$HOME/.gem/ruby/2.4.0/bin"
+
 # Set the DEFAULT_USER variable to me (jonny)
 export DEFAULT_USER="jonny"
 
