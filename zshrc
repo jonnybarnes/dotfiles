@@ -58,6 +58,11 @@ bindkey -v
 # Source the untracked `extra` file
 test -e $HOME/.extra && source $HOME/.extra
 
+# Source VTE for Terminix
+if [ $TERMINIX_ID ] || [ $VTE_VERSION ]; then
+        source /etc/profile.d/vte.sh
+fi
+
 # Determine the running OS
 platform="unkown"
 unamestr=$(uname -s)
@@ -121,6 +126,9 @@ alias bubc="brew upgrade && brew cleanup"
 alias bubo="brew update && brew outdated"
 alias brewcurl="/usr/local/opt/curl/bin/curl --cacert /usr/local/etc/openssl/cert.pem"
 alias brewssl="/usr/local/opt/openssl/bin/openssl"
+alias ga="git add"
+alias gf="git fetch --all; git fetch --tags"
+alias gs="git status"
 alias irc="ssh jmb -t '. ~/.zshrc; tmux attach -t irc'"
 test "$platform" = 'linux' && alias ls="ls -F --color=always"
 test "$platform" = 'osx' && alias ls="ls -FG"
@@ -146,10 +154,9 @@ auto-ls () {
 chpwd_functions=( auto-ls $chpwd_functions )
 
 # Go Lang stuff
-test "$platform" = 'osx' && export GOPATH="$HOME/Development/go"
-test "$platform" = 'osx' && export PATH="$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin"
-test "$platform" = 'linux' && export GOPATH="$HOME/mygo"
-test "$platform" = 'linux' && export PATH="$PATH:/usr/lib/go-1.7/bin:$GOPATH/bin"
+test "$platform" = 'linux' && export GOPATH=$HOME/go
+test "$platform" = 'osx' && export GOPATH=$HOME/Development/go
+export PATH="$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin"
 
 # GnuPG stuff
 GPG_TTY=`tty`
@@ -161,6 +168,12 @@ test "$platform" = 'osx' && export PATH="$PATH:/Users/jonny/.composer/vendor/bin
 
 # yarn PATH
 export PATH="$PATH:$HOME/.yarn/bin"
+
+# rust/cargo bin PATH
+export PATH="$PATH:$HOME/.cargo/bin"
+
+# Ruby PATH
+export PATH="$PATH:$HOME/.gem/ruby/2.4.0/bin"
 
 # Set the DEFAULT_USER variable to me (jonny)
 export DEFAULT_USER="jonny"
