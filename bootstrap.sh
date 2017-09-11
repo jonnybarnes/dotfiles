@@ -14,6 +14,7 @@ test -L $HOME/.gitignore || ln -f -s $BASEDIR/gitignore $HOME/.gitignore
 test -L $HOME/.hushlogin || ln -f -s $BASEDIR/hushlogin $HOME/.hushlogin
 test -d $HOME/.ncmpcpp || mkdir $HOME/.ncmpcpp
 test -L $HOME/.ncmpcpp/config || ln -f -s $BASEDIR/ncmpcpp $HOME/.ncmpcpp/config
+test -L $HOME/.functions.zsh || ln -f -s $BASEDIR/functions.zsh $HOME/.functions.zsh
 test -L $HOME/.zshrc || ln -f -s $BASEDIR/zshrc $HOME/.zshrc
 
 # ln vim files

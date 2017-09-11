@@ -190,4 +190,7 @@ export LS_COLORS='di=33;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43
 # They are packaged correctly for Arch Linux
 test "$platform" = 'osx' && fpath=(/usr/local/share/zsh-completions $fpath)
 
+# Source my own functions
+test -e $HOME/.functions.zsh && source $HOME/.functions.zsh
+
 test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
