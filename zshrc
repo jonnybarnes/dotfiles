@@ -58,6 +58,11 @@ bindkey -v
 # Source the untracked `extra` file
 test -e $HOME/.extra && source $HOME/.extra
 
+# Source VTE for Terminix
+if [ $TERMINIX_ID ] || [ $VTE_VERSION ]; then
+        source /etc/profile.d/vte.sh
+fi
+
 # Determine the running OS
 platform="unkown"
 unamestr=$(uname -s)
@@ -121,10 +126,12 @@ alias bubc="brew upgrade && brew cleanup"
 alias bubo="brew update && brew outdated"
 alias brewcurl="/usr/local/opt/curl/bin/curl --cacert /usr/local/etc/openssl/cert.pem"
 alias brewssl="/usr/local/opt/openssl@1.1/bin/openssl"
+alias ga="git add"
+alias gf="git fetch --all; git fetch --tags"
+alias gs="git status"
 alias irc="ssh jmb -t '. ~/.zshrc; tmux attach -t irc'"
 test "$platform" = 'linux' && alias ls="ls -F --color=always"
 test "$platform" = 'osx' && alias ls="ls -FG"
-alias phpunit="phpdbg -qrr vendor/bin/phpunit"
 test "$platform" = 'linux' && alias pipup="pip freeze --local | grep -v '^\-e' | cut -d = -f 1 | xargs -n1 sudo pip install -U"
 test "$platform" = 'osx' && alias pipup="pip3 freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip3 install -U"
 alias rtor="tmux attach -t rtor"
@@ -146,7 +153,8 @@ auto-ls () {
 chpwd_functions=( auto-ls $chpwd_functions )
 
 # Go Lang stuff
-export GOPATH=$HOME/Development/go
+test "$platform" = 'linux' && export GOPATH=$HOME/go
+test "$platform" = 'osx' && export GOPATH=$HOME/Development/go
 export PATH="$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin"
 
 # GnuPG stuff
@@ -163,6 +171,9 @@ export PATH="$PATH:$HOME/.yarn/bin"
 # rust/cargo bin PATH
 export PATH="$PATH:$HOME/.cargo/bin"
 
+# Ruby PATH
+export PATH="$PATH:$HOME/.gem/ruby/2.4.0/bin"
+
 # Set the DEFAULT_USER variable to me (jonny)
 export DEFAULT_USER="jonny"
 
@@ -178,5 +189,8 @@ export LS_COLORS='di=33;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43
 # Add zsh-completions to the fpath
 # They are packaged correctly for Arch Linux
 test "$platform" = 'osx' && fpath=(/usr/local/share/zsh-completions $fpath)
+
+# Source my own functions
+test -e $HOME/.functions.zsh && source $HOME/.functions.zsh
 
 test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh

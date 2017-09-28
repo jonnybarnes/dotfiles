@@ -199,6 +199,10 @@ nnoremap <Down> :echomsg "use j"<cr>
 nnoremap <Left> :echomsg "use j"<cr>
 nnoremap <Right> :echomsg "use l"<cr>
 
+" And spell-checking
+autocmd FileType gitcommit setlocal spell
+set complete+=kspell
+
 " Keymap to open NERDtree
 map <C-n> :NERDTreeToggle<cr>
 " Autoclose when NERDtree is the last buffer
