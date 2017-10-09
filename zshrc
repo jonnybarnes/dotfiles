@@ -128,6 +128,7 @@ alias brewcurl="/usr/local/opt/curl/bin/curl --cacert /usr/local/etc/openssl/cer
 alias brewssl="/usr/local/opt/openssl@1.1/bin/openssl"
 alias ga="git add"
 alias gf="git fetch --all; git fetch --tags"
+alias git="hub"
 alias gs="git status"
 alias irc="ssh jmb -t '. ~/.zshrc; tmux attach -t irc'"
 test "$platform" = 'linux' && alias ls="ls -F --color=always"
