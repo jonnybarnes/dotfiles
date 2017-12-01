@@ -140,7 +140,7 @@ set expandtab
 " Indentation settings for using hard tabs for indent. Display tabs as
 " two characters wide.
 "set shiftwidth=2
-"set tabstop=2
+set tabstop=4
 
 " Force the cursor onto a new line after 80 characters
 set textwidth=80
