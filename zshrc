@@ -156,7 +156,7 @@ chpwd_functions=( auto-ls $chpwd_functions )
 # Go Lang stuff
 test "$platform" = 'linux' && export GOPATH=$HOME/go
 test "$platform" = 'osx' && export GOPATH=$HOME/Development/go
-export PATH="$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin"
+export PATH="$PATH:/usr/local/go/bin:/usr/local/opt/go/libexec/bin:$GOPATH/bin"
 
 # GnuPG stuff
 GPG_TTY=`tty`
