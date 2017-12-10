@@ -166,14 +166,14 @@ export GPG_TTY
 test "$platform" = 'linux' && export PATH="$PATH:/home/jonny/.composer/vendor/bin"
 test "$platform" = 'osx' && export PATH="$PATH:/Users/jonny/.composer/vendor/bin"
 
-# yarn PATH
-export PATH="$PATH:$HOME/.yarn/bin"
-
 # rust/cargo bin PATH
 export PATH="$PATH:$HOME/.cargo/bin"
 
 # Ruby PATH
 export PATH="$PATH:$HOME/.gem/ruby/2.4.0/bin"
+
+# PostgreSQL binaries
+test -d /usr/local/pgsql && export PATH="$PATH:/usr/local/pgsql/bin"
 
 # Set the DEFAULT_USER variable to me (jonny)
 export DEFAULT_USER="jonny"
