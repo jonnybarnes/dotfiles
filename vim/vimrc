@@ -190,8 +190,7 @@ let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 " php syntastic options
 " order of checking
-let g:syntastic_php_checkers = ['php', 'phpcs', 'phpmd']
-let g:syntastic_php_phpcs_args = '--standard=PSR2'
+let g:syntastic_php_checkers = ['php']
 
 " Let’s use Vim properly, no arrow keys
 nnoremap <Up> :echomsg "use k"<cr>
