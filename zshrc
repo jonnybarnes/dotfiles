@@ -175,6 +175,9 @@ export PATH="$PATH:$HOME/.gem/ruby/2.4.0/bin"
 # PostgreSQL binaries
 test -d /usr/local/pgsql && export PATH="$PATH:/usr/local/pgsql/bin"
 
+# PHP binaries
+test -d $HOME/.php/bin && export PATH="$PATH:$HOME/.php/bin"
+
 # Set the DEFAULT_USER variable to me (jonny)
 export DEFAULT_USER="jonny"
 
