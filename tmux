@@ -14,3 +14,6 @@ set -g mouse on
 
 # don't rename windows automatically
 set-option -g allow-rename off
+
+# Get 256 colour support
+set -g default-terminal "xterm-256color"
