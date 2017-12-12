@@ -162,6 +162,9 @@ map Y y$
 " next search
 nnoremap <C-L> :nohl<CR><C-L>
 
+"------------------------------------------------------------
+" Add the powerline statusbar
+set rtp+=/home/jonny/powerline/powerline/bindings/vim
 
 "------------------------------------------------------------
 " Personal settings
