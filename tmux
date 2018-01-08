@@ -16,4 +16,4 @@ set -g mouse on
 set-option -g allow-rename off
 
 # Get 256 colour support
-set -g default-terminal "xterm-256color"
+set -g default-terminal "screen-256color"
