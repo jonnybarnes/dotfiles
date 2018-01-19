@@ -183,6 +183,7 @@ export DEFAULT_USER="jonny"
 
 # No Homebrew analytics
 export HOMEBREW_NO_ANALYTICS=1
+export HOMEBREW_AUTO_UPDATE_SECS=3600
 
 # Colourised output for `ls`
 export CLICOLOR=true
