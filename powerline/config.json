@@ -1,0 +1,16 @@
+{
+    "common": {
+        "term_truecolor": false,
+        "log_file": "~/.powerline.log"
+    },
+    "ext": {
+        "shell": {
+            "colorscheme": "default",
+            "theme": "default",
+            "local_themes": {
+                "continuation": "continuation",
+                "select": "select"
+            }
+        }
+    }
+}
