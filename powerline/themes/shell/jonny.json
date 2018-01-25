@@ -2,16 +2,18 @@
     "segments": {
         "left": [
             {
-                "function": "powerline.segments.common.net.hostname",
-                "priority": 10
-            },
-            {
                 "function": "powerline.segments.common.env.user",
-                "priority": 30
+                "priority": 30,
+                "args": {
+                    "hide_user": "jonny"
+                }
             },
             {
-                "function": "powerline.segments.common.env.virtualenv",
-                "priority": 50
+                "function": "powerline.segments.common.net.hostname",
+                "priority": 10,
+                "args": {
+                    "only_if_ssh": true
+                }
             },
             {
                 "function": "powerline.segments.shell.cwd",
@@ -34,6 +36,10 @@
             {
                 "function": "powerline.segments.common.vcs.branch",
                 "priority": 40
+            },
+            {
+                "function": "powerline.segments.common.time.fuzzy_time",
+                "priority": 10
             }
         ]
     }
