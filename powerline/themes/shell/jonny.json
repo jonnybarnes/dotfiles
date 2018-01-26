@@ -35,7 +35,10 @@
             },
             {
                 "function": "powerline.segments.common.vcs.branch",
-                "priority": 40
+                "priority": 40,
+                "args": {
+                    "status_colors": true
+                }
             },
             {
                 "function": "powerline.segments.common.time.fuzzy_time",

@@ -7,17 +7,17 @@
             "attrs": []
         },
         "branch": { 
-            "fg": "gray9",
+            "fg": "white",
             "bg": "darkblue",
             "attrs": []
         },
         "branch_dirty": {
-            "fg": "brightyellow",
-            "bg": "darkblue",
+            "fg": "black",
+            "bg": "brightyellow",
             "attrs": []
         },
         "branch_clean": {
-            "fg": "gray9",
+            "fg": "white",
             "bg": "darkblue",
             "attrs": []
         },
@@ -27,7 +27,7 @@
             "attrs": []
         },
         "cwd": {
-            "fg": "darkcyan",
+            "fg": "gray9",
             "bg": "gray4",
             "attrs": []
         },
@@ -37,7 +37,7 @@
             "attrs": ["bold"]
         },
         "cwd:divider": {
-            "fg": "yellow",
+            "fg": "gray0",
             "bg": "gray4",
             "attrs": []
         },
