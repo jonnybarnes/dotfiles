@@ -97,6 +97,12 @@ set ruler
 " Always display the status line, even if only one window is displayed
 set laststatus=2
 
+" Always display the tabline, even if there is only one tab
+set showtabline=2
+
+" Hide the default mode text (e.g. -- INSERT -- below the statusline)
+set noshowmode
+
 " Instead of failing a command because of unsaved changes, instead raise a
 " dialogue asking if you wish to save changed files.
 set confirm
@@ -164,7 +170,16 @@ nnoremap <C-L> :nohl<CR><C-L>
 
 "------------------------------------------------------------
 " Add the powerline statusbar
-set rtp+=/home/jonny/powerline/powerline/bindings/vim
+
+" Linux
+if (filereadable("/usr/lib/python3.6/site-packages/powerline/bindings/vim/__init__.py"))
+    set rtp+=/usr/lib/python3.6/site-packages/powerline/bindings/vim
+endif
+" macOS
+if (filereadable("/usr/local/lib/python3.6/site-packages/powerline/bindings/vim/__init__.py"))
+    set rtp+=/usr/local/lib/python3.6/site-packages/powerline/bindings/vim
+endif
+let g:powerline_pycmd = "py3"
 
 "------------------------------------------------------------
 " Personal settings
