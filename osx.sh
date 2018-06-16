@@ -46,6 +46,9 @@ defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 # Display full POSIX path as Finder window title
 defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
+# New Finder windows points to home
+defaults write com.apple.finder NewWindowTarget -string "PfHm"
+
 # When performing a search, search the current folder by default
 defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
 
@@ -87,6 +90,12 @@ defaults write com.apple.dock autohide -bool true
 
 # Automatically hide the menu bar
 defaults write NSGlobalDomain _HIHideMenuBar -bool true
+
+# Show Bluetooth in the menu bar
+defaults write com.apple.systemuiserver "NSStatusItem Visible com.apple.menuextra.bluetooth" -int 0
+
+# Use a dark menu bar / dock
+defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
 
 ## Safari and Webkit
 # Privacy: don’t send search queries to Apple
