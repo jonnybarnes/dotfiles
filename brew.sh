@@ -21,7 +21,7 @@ brew install gnu-sed --with-default-names
 brew install wget --with-iri
 
 # Install more recent versions of some OS X tools.
-brew install vim --override-system-vi
+brew install vim --with-override-system-vi
 brew install grep
 brew install openssh
 
@@ -36,6 +36,7 @@ brew install git
 brew install git-lfs
 brew install diff-so-fancy
 brew install gnupg
+brew install hub
 brew install imagemagick --with-webp --with-libheif
 brew install lua
 brew install lynx
