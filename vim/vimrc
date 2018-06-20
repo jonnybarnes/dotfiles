@@ -198,7 +198,7 @@ set background=dark
 "let g:solarized_termcolors=256
 "let g:solarized_contrast="high"
 "let g:solarized_visibilty="high"
-colorscheme solarized
+"colorscheme solarized
 
 
 " syntastic settings from the readme
