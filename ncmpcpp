@@ -19,7 +19,7 @@ lyrics_directory = ~/.lyrics
 #
 ##### connection settings #####
 #
-mpd_host = localhost
+mpd_host = "~/.mpd/socket"
 #
 mpd_port = 6600
 #
@@ -27,7 +27,7 @@ mpd_connection_timeout = 5
 #
 ## Needed for tag editor and file operations to work.
 ##
-mpd_music_dir = ~/music
+mpd_music_dir = "/mnt/DATA3/music"
 #
 #mpd_crossfade_time = 5
 #
