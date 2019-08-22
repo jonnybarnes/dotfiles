@@ -70,7 +70,7 @@ export PATH="$PATH:$HOME/.composer/vendor/bin"
 export PATH="$PATH:$HOME/.cargo/bin"
 
 # Ruby PATH
-export PATH="$PATH:$HOME/.gem/ruby/2.4.0/bin"
+export PATH="/usr/local/opt/ruby/bin:$PATH:$HOME/.gem/ruby/2.4.0/bin"
 
 # PostgreSQL binaries
 test -d /usr/local/pgsql && export PATH="$PATH:/usr/local/pgsql/bin"
