@@ -25,3 +25,10 @@ gencert () {
     cd $HOME/git/ca
     echo 'Certs generated for $DOMAIN'
 }
+
+# Generate a random 7 digit number, used for CCL’s ImKeys
+imkey () {
+    imkey=$(shuf -i 1111111-9999999 -n1)
+
+    echo $imkey
+}
