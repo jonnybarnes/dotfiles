@@ -9,7 +9,9 @@ bindkey -v
 autoload -Uz compinit promptinit run-help
 compinit
 promptinit
-unalias run-help
+case $(type run-help) in
+    (*alias*) unalias run-help;;
+esac
 alias help=run-help
 # Persistant rehash to find new programs in the $PATH
 zstyle ':completion:*' rehash true
