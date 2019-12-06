@@ -80,6 +80,9 @@ test -d /usr/local/pgsql && export PATH="$PATH:/usr/local/pgsql/bin"
 # PHP binaries
 test -d $HOME/.php/bin && export PATH="$PATH:$HOME/.php/bin"
 
+# macOS Python User binaries
+test -d $HOME/Library/Python/3.7/bin && export PATH="$PATH:$HOME/Library/Python/3.7/bin"
+
 # Set Homebrew Env variables
 export HOMEBREW_NO_ANALYTICS=1
 export HOMEBREW_AUTO_UPDATE_SECS=3600
