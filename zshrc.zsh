@@ -64,6 +64,8 @@ export PATH="$PATH:/usr/local/go/bin:/usr/local/opt/go/libexec/bin:$GOPATH/bin"
 # GnuPG stuff
 GPG_TTY=`tty`
 export GPG_TTY
+gpg-connect-agent /bye
+export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
 
 # composer global
 export PATH="$PATH:$HOME/.composer/vendor/bin"
