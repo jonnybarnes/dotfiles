@@ -3,8 +3,10 @@
 HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=10000
+
 # vim binddings
 bindkey -v
+
 # ZSH builtin autoload
 autoload -Uz compinit promptinit run-help
 compinit
@@ -31,9 +33,6 @@ export MANPATH="/usr/local/man:$MANPATH"
 
 # Determine the running OS
 source $HOME/.zsh/platform.zsh
-
-# Set a powerline prompt
-source $HOME/.zsh/powerline-prompt.zsh
 
 # ZSH syntax highlighting
 source $HOME/.zsh/zsh-syntax-highlighting.zsh
@@ -64,8 +63,6 @@ export PATH="$PATH:/usr/local/go/bin:/usr/local/opt/go/libexec/bin:$GOPATH/bin"
 # GnuPG stuff
 GPG_TTY=`tty`
 export GPG_TTY
-gpg-connect-agent /bye
-export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
 
 # composer global
 export PATH="$PATH:$HOME/.composer/vendor/bin"
@@ -107,3 +104,6 @@ test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_in
 
 # Source the untracked `extra` file
 test -e $HOME/.extra && source $HOME/.extra
+
+# Init starship prompt -- https://starship.rs
+eval "$(starship init zsh)"
