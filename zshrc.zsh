@@ -56,8 +56,7 @@ auto-ls () {
 chpwd_functions=( auto-ls $chpwd_functions )
 
 # Go Lang stuff
-test $PLATFORM = 'linux' && export GOPATH=$HOME/go
-test $PLATFORM = 'osx' && export GOPATH=$HOME/Development/go
+export GOPATH=$HOME/go
 export PATH="$PATH:/usr/local/go/bin:/usr/local/opt/go/libexec/bin:$GOPATH/bin"
 
 # GnuPG stuff

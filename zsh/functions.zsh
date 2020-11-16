@@ -19,7 +19,7 @@ gencert () {
 
     openssl ecparam -name secp384r1 -genkey -noout -out key
     chmod 644 key
-    openssl req -new -sha256 -key key -subj "/C=UK/ST=England/L=Darwen/O=JMB Dev Ltd/CN=$DOMAIN" -reqexts SAN -config <(cat $SSLCNF <(printf "[SAN]\nsubjectAltName=DNS:$DOMAIN")) -out csr
+    openssl req -new -sha256 -key key -subj "/C=UK/ST=England/L=Bury/O=JMB Dev Ltd/CN=$DOMAIN" -reqexts SAN -config <(cat $SSLCNF <(printf "[SAN]\nsubjectAltName=DNS:$DOMAIN")) -out csr
     openssl x509 -req -in csr -extfile <(cat $SSLCNF <(printf "[SAN]\nsubjectAltName=DNS:$DOMAIN")) -extensions SAN -CA ../jmb-ca-ecc.pem -CAkey ../jmb-ca-ecc.key -CAcreateserial -days 90 -sha256 -out crt
 
     cd $HOME/git/ca

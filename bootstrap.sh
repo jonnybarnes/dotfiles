@@ -17,7 +17,6 @@ test -L $HOME/.ncmpcpp/config || ln -f -s $BASEDIR/ncmpcpp $HOME/.ncmpcpp/config
 test -L $HOME/.tmux.conf || ln -f -s $BASEDIR/tmux $HOME/.tmux.conf
 test -L $HOME/.zsh || ln -f -s $BASEDIR/zsh $HOME/.zsh
 test -L $HOME/.zshrc || ln -f -s $BASEDIR/zshrc.zsh $HOME/.zshrc
-test -L $HOME/.config/powerline || ln -f -s $BASEDIR/powerline $HOME/.config/powerline
 
 # ln vim files
 echo "Setting up vim"
