@@ -8,6 +8,9 @@ SAVEHIST=10000
 bindkey -v
 
 # ZSH builtin autoload
+if type brew &>/dev/null; then
+    FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+fi
 autoload -Uz compinit promptinit run-help
 compinit
 promptinit
