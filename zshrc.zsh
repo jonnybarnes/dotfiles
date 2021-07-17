@@ -51,10 +51,11 @@ source $HOME/.zsh/aliases.zsh
 
 # credit Paul Irish: https://github.com/paulirish/dotfiles/blob/606d85f083eb53853789ce9dcaf31a49756471bd/.zshrc#L80
 # Automatically list directory contents on `cd`.
+# Switched to using `exa` instead of `ls`.
 auto-ls () {
     emulate -L zsh;
-    # explicit sexy ls'ing as aliases arent honored in here.
-    hash gls >/dev/null 2>&1 && CLICOLOR_FORCE=1 gls -aFh --color --group-directories-first || ls
+
+    exa --oneline --long --classify --icons --header
 }
 chpwd_functions=( auto-ls $chpwd_functions )
 
@@ -109,3 +110,10 @@ test -e $HOME/.extra && source $HOME/.extra
 
 # Init starship prompt -- https://starship.rs
 eval "$(starship init zsh)"
+
+
+#### FIG ENV VARIABLES ####
+[ -s ~/.fig/fig.sh ] && source ~/.fig/fig.sh
+#### END FIG ENV VARIABLES ####
+
+
