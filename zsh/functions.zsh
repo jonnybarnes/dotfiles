@@ -32,3 +32,38 @@ imkey () {
 
     echo $imkey
 }
+
+# Delete branches selected via fzf
+delete-branches () {
+    git branch |
+        grep --invert-match '\*' | # Remove current branch
+        fzf --multi --preview="git log {..}" |
+        gxargs --no-run-if-empty git branch --delete
+}
+
+# Delete branches selected via fzf (force the deletion)
+delete-branches-force () {
+    git branch |
+        grep --invert-match '\*' | # Remove current branch
+        fzf --multi --preview="git log {..}" |
+        gxargs --no-run-if-empty git branch --delete --force
+}
+
+# Open a PR
+function pr-checkout() {
+    local pr_number
+
+    pr_number=$(
+        gh api 'repos/:owner/:repo/pulls' --jq '.[] | "#\(.number) \(.title)"' |
+            fzf |
+            sd '^\#(\d+)\s.*' '$1'
+    )
+
+    if [ -n "$pr_number" ]; then
+        gh pr checkout "$pr_number"
+    fi
+}
+
+function watch-file() {
+    tail -f $1 | bat --paging=never -l log
+}
