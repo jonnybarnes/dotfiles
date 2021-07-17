@@ -31,8 +31,8 @@ export EDITOR='vim'
 export DEFAULT_USER="jonny"
 
 # Set the $PATH
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:$HOME/.local/bin"
-export MANPATH="/usr/local/man:$MANPATH"
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/sbin:/usr/local/sbin:/usr/sbin:/sbin:$HOME/.local/bin"
+export MANPATH="/opt/homebrew/manpages:/usr/local/man:$MANPATH"
 
 # Determine the running OS
 source $HOME/.zsh/platform.zsh
