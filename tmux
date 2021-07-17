@@ -17,3 +17,6 @@ set-option -g allow-rename off
 
 # Get 256 colour support
 set -g default-terminal "screen-256color"
+# Fig Tmux Integration: Enabled
+source-file ~/.fig/tmux
+# End of Fig Tmux Integration
