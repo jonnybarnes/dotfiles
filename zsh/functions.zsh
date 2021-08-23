@@ -7,7 +7,9 @@ gencert () {
     DOMAIN=$1
 
     test -d /usr/local/opt/openssl@1.1/bin && PATH='/usr/local/opt/openssl@1.1/bin':$PATH
+    test -d /opt/homebrew/opt/openssl@1.1/bin && PATH='/opt/homebrew/opt/openssl@1.1/bin':$PATH
     test -f /usr/local/etc/openssl@1.1/openssl.cnf && SSLCNF='/usr/local/etc/openssl@1.1/openssl.cnf'
+    test -f /opt/homebrew/etc/openssl@1.1/openssl.cnf && SSLCNF='/opt/homebrew/etc/openssl@1.1/openssl.cnf'
     test -f /etc/ssl/openssl.cnf && SSLCNF='/etc/ssl/openssl.cnf'
 
     cd $HOME/git/ca
