@@ -39,7 +39,7 @@
 [help]
 
     # Automatically correct typos in commands
-    autocorrect = 1
+    autoCorrect = prompt
 
 [pager]
 
