@@ -118,6 +118,9 @@ if type thefuck &> /dev/null; then
   eval $(thefuck --alias)
 fi
 
+# https://github.com/wfxr/forgit
+test -e $HOME/git/forgit/forgit.plugin.zsh && source ~/git/forgit/forgit.plugin.zsh
+
 # Init starship prompt -- https://starship.rs
 eval "$(starship init zsh)"
 
