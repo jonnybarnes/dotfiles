@@ -1,6 +1,8 @@
 export PLATFORM="unkown"
+
 osname=$(uname -s)
-cputpye=£(uname -m)
+cputype=$(uname -m)
+
 if [[ "$osname" == 'Linux' ]]; then
     export PLATFORM="linux"
 elif [[ "$osname" == 'Darwin' ]]; then
