@@ -16,13 +16,13 @@
     # Detect whitespace errors when applying a patch
     whitespace = fix
 
-[color "diff-highlight"]
+#[color "diff-highlight"]
 
     # Colours for `diff-so-fancy`
-    oldNormal = "red bold"
-    oldHighlight = "red bold 52"
-    newNormal = "green bold"
-    newHighlight = "green bold 22"
+    #oldNormal = "red bold"
+    #oldHighlight = "red bold 52"
+    #newNormal = "green bold"
+    #newHighlight = "green bold 22"
 
 [filter "lfs"]
 
@@ -41,8 +41,24 @@
     # Automatically correct typos in commands
     autoCorrect = prompt
 
-[pager]
+#[pager]
 
     # Make diff-so-fancy apply all the time
-    diff = "diff-so-fancy | less --tabs=4 -RFX"
-    show = "diff-so-fancy | less --tabs=4 -RFX"
+    #diff = "diff-so-fancy | less --tabs=4 -RFX"
+    #show = "diff-so-fancy | less --tabs=4 -RFX"
+
+[core]
+    pager = delta
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true  # use n and N to move between diff sections
+
+[merge]
+    conflictstyle = zdiff3
+
+[diff]
+    algorithm = histogram
+    colorMoved = default
