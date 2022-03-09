@@ -72,6 +72,9 @@ export PATH="$PATH:/usr/local/go/bin:/usr/local/opt/go/libexec/bin:$GOPATH/bin"
 GPG_TTY=`tty`
 export GPG_TTY
 
+# Set the rip (Rm ImProved) graveyard
+export GRAVEYARD="$HOME/.local/share/Trash"
+
 # composer global
 export PATH="$PATH:$HOME/.composer/vendor/bin"
 
