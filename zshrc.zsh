@@ -1,7 +1,8 @@
-#### FIG ENV VARIABLES ####
-# Please make sure this block is at the start of this file.
-[ -s ~/.fig/shell/pre.sh ] && source ~/.fig/shell/pre.sh
-#### END FIG ENV VARIABLES ####
+# Fig pre block. Keep at the top of this file.
+export PATH="${PATH}:${HOME}/.local/bin"
+eval "$(fig init zsh pre)"
+
+
 
 # User configuration
 # history
@@ -124,12 +125,13 @@ fi
 # https://github.com/wfxr/forgit
 test -e $HOME/git/forgit/forgit.plugin.zsh && source ~/git/forgit/forgit.plugin.zsh
 
+# McFly
+if type mcfly &> /dev/null; then
+  eval $(mcfly init zsh)
+fi
+
 # Init starship prompt -- https://starship.rs
 eval "$(starship init zsh)"
 
-
-#### FIG ENV VARIABLES ####
-[ -s ~/.fig/fig.sh ] && source ~/.fig/fig.sh
-#### END FIG ENV VARIABLES ####
-
-
+# Fig post block. Keep at the bottom of this file.
+eval "$(fig init zsh post)"
