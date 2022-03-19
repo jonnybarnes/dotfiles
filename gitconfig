@@ -62,3 +62,6 @@
 [diff]
     algorithm = histogram
     colorMoved = default
+
+[init]
+    defaultBranch = main
