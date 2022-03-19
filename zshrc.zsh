@@ -115,6 +115,9 @@ test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_in
 # Source the untracked `extra` file
 test -e $HOME/.extra && source $HOME/.extra
 
+# Load MacTex commands
+eval $(/usr/libexec/path_helper)
+
 # Init the fuck
 if type thefuck &> /dev/null; then
   eval $(thefuck --alias)
