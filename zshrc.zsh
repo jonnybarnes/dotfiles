@@ -2,8 +2,6 @@
 export PATH="${PATH}:${HOME}/.local/bin"
 eval "$(fig init zsh pre)"
 
-
-
 # User configuration
 # history
 HISTFILE=~/.histfile
