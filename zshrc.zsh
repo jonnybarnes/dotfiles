@@ -1,5 +1,4 @@
 # Fig pre block. Keep at the top of this file.
-export PATH="${PATH}:${HOME}/.local/bin"
 eval "$(fig init zsh pre)"
 
 # User configuration
@@ -34,7 +33,11 @@ export EDITOR='vim'
 # Set the DEFAULT_USER variable to me (jonny)
 export DEFAULT_USER="jonny"
 
-# Set the $PATH
+# Autoadd to PATH (neede for MacTex)
+# It prepends to $PATH, so we do it first then add our own
+eval $(/usr/libexec/path_helper)
+
+# Add our own dirs to the $PATH
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/sbin:/usr/local/sbin:/usr/sbin:/sbin:$HOME/.local/bin"
 export MANPATH="/opt/homebrew/manpages:/usr/local/man:$MANPATH"
 
@@ -114,9 +117,6 @@ test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_in
 
 # Source the untracked `extra` file
 test -e $HOME/.extra && source $HOME/.extra
-
-# Load MacTex commands
-eval $(/usr/libexec/path_helper)
 
 # Init the fuck
 if type thefuck > /dev/null; then
