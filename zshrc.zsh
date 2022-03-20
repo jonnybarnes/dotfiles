@@ -119,8 +119,8 @@ test -e $HOME/.extra && source $HOME/.extra
 eval $(/usr/libexec/path_helper)
 
 # Init the fuck
-if type thefuck &> /dev/null; then
-  eval $(thefuck --alias)
+if type thefuck > /dev/null; then
+  eval "$(thefuck --alias)"
 fi
 
 # https://github.com/wfxr/forgit
