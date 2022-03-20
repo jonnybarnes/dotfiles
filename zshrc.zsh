@@ -127,8 +127,8 @@ fi
 test -e $HOME/git/forgit/forgit.plugin.zsh && source ~/git/forgit/forgit.plugin.zsh
 
 # McFly
-if type mcfly &> /dev/null; then
-  eval $(mcfly init zsh)
+if type mcfly > /dev/null; then
+  eval "$(mcfly init zsh)"
 fi
 
 # Init starship prompt -- https://starship.rs
