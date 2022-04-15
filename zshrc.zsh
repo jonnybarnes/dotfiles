@@ -1,3 +1,5 @@
+# Fig binary can be installed to $HOME, so ammend the $PATH
+export PATH="$PATH:$HOME/.local/bin"
 # Fig pre block. Keep at the top of this file.
 eval "$(fig init zsh pre)"
 
