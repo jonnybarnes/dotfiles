@@ -35,7 +35,9 @@ export DEFAULT_USER="jonny"
 
 # Autoadd to PATH (neede for MacTex)
 # It prepends to $PATH, so we do it first then add our own
-eval $(/usr/libexec/path_helper)
+if [[ -f /usr/libexec/path_helper ]]; then
+    eval $(/usr/libexec/path_helper)
+fi
 
 # Add our own dirs to the $PATH
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/sbin:/usr/local/sbin:/usr/sbin:/sbin:$HOME/.local/bin"
