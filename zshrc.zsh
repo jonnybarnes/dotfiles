@@ -1,7 +1,9 @@
 # Fig binary can be installed to $HOME, so ammend the $PATH
 export PATH="$PATH:$HOME/.local/bin"
 # Fig pre block. Keep at the top of this file.
-eval "$(fig init zsh pre)"
+if [ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]; then
+    "$HOME/.fig/shell/zshrc.pre.zsh"
+fi
 
 # User configuration
 # history
@@ -139,5 +141,6 @@ fi
 eval "$(starship init zsh)"
 
 # Fig post block. Keep at the bottom of this file.
-eval "$(fig init zsh post)"
-
+if [ -f "$HOME/.fig/shell/zshrc.post.zsh" ]; then
+    "$HOME/.fig/shell/zshrc.post.zsh"
+fi
