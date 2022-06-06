@@ -2,7 +2,7 @@
 export PATH="$PATH:$HOME/.local/bin"
 # Fig pre block. Keep at the top of this file.
 if [ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]; then
-    . "$HOME/.fig/shell/zshrc.pre.zsh"
+  . "$HOME/.fig/shell/zshrc.pre.zsh"
 fi
 
 # User configuration
@@ -142,5 +142,5 @@ eval "$(starship init zsh)"
 
 # Fig post block. Keep at the bottom of this file.
 if [ -f "$HOME/.fig/shell/zshrc.post.zsh" ]; then
-    . "$HOME/.fig/shell/zshrc.post.zsh"
+  . "$HOME/.fig/shell/zshrc.post.zsh"
 fi
