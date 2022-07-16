@@ -44,7 +44,7 @@ if [[ -f /usr/libexec/path_helper ]]; then
 fi
 
 # Add our own dirs to the $PATH
-export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/sbin:/usr/local/sbin:/usr/sbin:/sbin:$HOME/.local/bin"
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/sbin:/usr/local/sbin:/usr/sbin:/sbin:$HOME/.local/bin:$PATH"
 export MANPATH="/opt/homebrew/manpages:/usr/local/man:$MANPATH"
 
 # Determine the running OS
