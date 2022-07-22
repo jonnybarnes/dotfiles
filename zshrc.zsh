@@ -81,6 +81,11 @@ export PATH="$PATH:$(brew --prefix)/go/bin:$(brew --prefix)/opt/go/libexec/bin:$
 GPG_TTY=`tty`
 export GPG_TTY
 
+# Add various GNU functions
+export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH"
+export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH"
+export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
+
 # Add Totara Docker helper functions
 export PATH="$PATH:$HOME/git/totara-docker-dev/bin"
 
