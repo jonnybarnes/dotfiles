@@ -17,6 +17,7 @@ bindkey -v
 # ZSH builtin autoload
 if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+  FPATH=$(brew --prefix)/share/zsh/zsh-completions:$FPATH
 fi
 autoload -Uz compinit promptinit run-help
 compinit
@@ -74,7 +75,7 @@ chpwd_functions=( auto-ls $chpwd_functions )
 
 # Go Lang stuff
 export GOPATH=$HOME/go
-export PATH="$PATH:/usr/local/go/bin:/usr/local/opt/go/libexec/bin:$GOPATH/bin"
+export PATH="$PATH:$(brew --prefix)/go/bin:$(brew --prefix)/opt/go/libexec/bin:$GOPATH/bin"
 
 # GnuPG stuff
 GPG_TTY=`tty`
@@ -93,10 +94,10 @@ export PATH="$PATH:$HOME/.composer/vendor/bin"
 export PATH="$PATH:$HOME/.cargo/bin"
 
 # Ruby PATH
-export PATH="$PATH:/usr/local/opt/ruby/bin:$HOME/.gem/ruby/2.4.0/bin"
+export PATH="$PATH:$(brew --prefix)/opt/ruby/bin:$HOME/.gem/ruby/2.4.0/bin"
 
 # PostgreSQL binaries
-test -d /usr/local/pgsql && export PATH="$PATH:/usr/local/pgsql/bin"
+test -d $(brew --prefix)/pgsql && export PATH="$PATH:$(brew --prefix)/pgsql/bin"
 
 # PHP binaries
 test -d $HOME/.php/bin && export PATH="$PATH:$HOME/.php/bin"
@@ -117,11 +118,6 @@ export CLICOLOR_FORCE=true
 export LSCOLORS='dxfxcxdxbxegedabagacad'
 export LS_COLORS='di=33;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=0;42:ow=0;43:'
 
-# Add zsh-completions to the fpath
-# They are packaged correctly for Arch Linux
-test $PLATFORM = 'osx' && fpath=(/usr/local/share/zsh-completions $fpath)
-test $PLATFORM = 'osx-m1' && fpath=(/opt/homebrew/share/zsh-completions $fpath)
-
 # Source my own functions
 test -e $HOME/.zsh/functions.zsh && source $HOME/.zsh/functions.zsh
 
@@ -137,7 +133,7 @@ if type thefuck > /dev/null; then
 fi
 
 # https://github.com/wfxr/forgit
-test -e $HOME/git/forgit/forgit.plugin.zsh && source ~/git/forgit/forgit.plugin.zsh
+test -e $HOME/git/forgit/forgit.plugin.zsh && source $HOME/git/forgit/forgit.plugin.zsh
 
 # McFly
 if type mcfly > /dev/null; then
