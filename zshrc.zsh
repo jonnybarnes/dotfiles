@@ -16,13 +16,13 @@ bindkey -v
 
 # ZSH builtin autoload
 if type brew &>/dev/null; then
-    FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
 fi
 autoload -Uz compinit promptinit run-help
 compinit
 promptinit
 case $(type run-help) in
-    (*alias*) unalias run-help;;
+  (*alias*) unalias run-help;;
 esac
 alias help=run-help
 # Persistant rehash to find new programs in the $PATH
@@ -40,7 +40,7 @@ export DEFAULT_USER="jonny"
 # Autoadd to PATH (neede for MacTex)
 # It prepends to $PATH, so we do it first then add our own
 if [[ -f /usr/libexec/path_helper ]]; then
-    eval $(/usr/libexec/path_helper)
+  eval $(/usr/libexec/path_helper)
 fi
 
 # Add our own dirs to the $PATH
@@ -66,9 +66,9 @@ source $HOME/.zsh/aliases.zsh
 # Automatically list directory contents on `cd`.
 # Switched to using `exa` instead of `ls`.
 auto-ls () {
-    emulate -L zsh;
+  emulate -L zsh;
 
-    exa --oneline --long --classify --icons --header
+  exa --oneline --long --classify --icons --header
 }
 chpwd_functions=( auto-ls $chpwd_functions )
 
@@ -93,7 +93,7 @@ export PATH="$PATH:$HOME/.composer/vendor/bin"
 export PATH="$PATH:$HOME/.cargo/bin"
 
 # Ruby PATH
-export PATH="/usr/local/opt/ruby/bin:$PATH:$HOME/.gem/ruby/2.4.0/bin"
+export PATH="$PATH:/usr/local/opt/ruby/bin:$HOME/.gem/ruby/2.4.0/bin"
 
 # PostgreSQL binaries
 test -d /usr/local/pgsql && export PATH="$PATH:/usr/local/pgsql/bin"
@@ -103,6 +103,9 @@ test -d $HOME/.php/bin && export PATH="$PATH:$HOME/.php/bin"
 
 # macOS Python User binaries
 test -d $HOME/Library/Python/3.7/bin && export PATH="$PATH:$HOME/Library/Python/3.7/bin"
+
+# JetBrains Toolbox scripts
+test -d "$HOME/Library/Application Support/JetBrains/Toolbox/scripts" && export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
 # Set Homebrew Env variables
 export HOMEBREW_NO_ANALYTICS=1
@@ -117,6 +120,7 @@ export LS_COLORS='di=33;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43
 # Add zsh-completions to the fpath
 # They are packaged correctly for Arch Linux
 test $PLATFORM = 'osx' && fpath=(/usr/local/share/zsh-completions $fpath)
+test $PLATFORM = 'osx-m1' && fpath=(/opt/homebrew/share/zsh-completions $fpath)
 
 # Source my own functions
 test -e $HOME/.zsh/functions.zsh && source $HOME/.zsh/functions.zsh
@@ -144,4 +148,6 @@ fi
 eval "$(starship init zsh)"
 
 # Fig post block. Keep at the bottom of this file.
-[[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && . "$HOME/.fig/shell/zshrc.post.zsh"
+if [ -f "$HOME/.fig/shell/zshrc.post.zsh" ]; then
+  . "$HOME/.fig/shell/zshrc.post.zsh"
+fi
