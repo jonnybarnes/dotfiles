@@ -24,5 +24,4 @@ alias startace="acestreamengine --client-console --upload-limit 0 --download-lim
 alias up="sudo pacman -Syu"
 alias aws-whoami="aws sts get-caller-identity"
 alias als="exa --oneline --long --classify --icons --header"
-
-alias testing="pwd"
+alias sail="[ -f sail ] && bash sail || bash vendor/bin/sail"
