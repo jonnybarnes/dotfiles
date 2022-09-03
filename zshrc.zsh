@@ -113,6 +113,9 @@ test -d $HOME/Library/Python/3.7/bin && export PATH="$PATH:$HOME/Library/Python/
 # JetBrains Toolbox scripts
 test -d "$HOME/Library/Application Support/JetBrains/Toolbox/scripts" && export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
+# Homebrew cURL if we have it
+test -d $(brew --prefix)/opt/curl && export PATH="$(brew --prefix)/opt/curl/bin:$PATH"
+
 # Set Homebrew Env variables
 export HOMEBREW_NO_ANALYTICS=1
 export HOMEBREW_AUTO_UPDATE_SECS=3600
