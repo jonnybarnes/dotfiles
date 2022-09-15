@@ -1,9 +1,6 @@
 # Fig pre block. Keep at the top of this file.
-# Fig binary can be installed to $HOME, so ammend the $PATH
-export PATH="$PATH:$HOME/.local/bin"
-if [ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]; then
-  . "$HOME/.fig/shell/zshrc.pre.zsh"
-fi
+[[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
+# Fig pre block. Keep at the top of this file.
 
 # User configuration
 # history
@@ -85,6 +82,7 @@ export GPG_TTY
 export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH"
 export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH"
 export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
+export PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH"
 
 # Add Totara Docker helper functions
 export PATH="$PATH:$HOME/git/totara-docker-dev/bin"
@@ -153,6 +151,4 @@ fi
 eval "$(starship init zsh)"
 
 # Fig post block. Keep at the bottom of this file.
-if [ -f "$HOME/.fig/shell/zshrc.post.zsh" ]; then
-  . "$HOME/.fig/shell/zshrc.post.zsh"
-fi
+[[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
