@@ -16,7 +16,7 @@ if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
   FPATH=$(brew --prefix)/share/zsh/zsh-completions:$FPATH
 fi
-autoload -Uz compinit promptinit run-help
+autoload -Uz compinit promptinit run-help zmv
 compinit
 promptinit
 case $(type run-help) in
