@@ -134,6 +134,11 @@ test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_in
 # Source the untracked `extra` file
 test -e $HOME/.extra && source $HOME/.extra
 
+# Setup NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
 # Init the fuck
 if type thefuck > /dev/null; then
   eval "$(thefuck --alias)"
