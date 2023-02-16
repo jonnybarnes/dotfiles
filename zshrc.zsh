@@ -116,8 +116,6 @@ test -d $(brew --prefix)/opt/curl && export PATH="$(brew --prefix)/opt/curl/bin:
 
 # Set Homebrew Env variables
 export HOMEBREW_NO_ANALYTICS=1
-export HOMEBREW_AUTO_UPDATE_SECS=3600
-export HOMEBREW_INSTALL_FROM_API=true
 
 # Colourised output for `ls`
 export CLICOLOR=true
