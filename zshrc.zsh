@@ -137,6 +137,11 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+# Setup GitHub Copilot
+if type github-copilot-cli > /dev/null; then
+  eval "$(github-copilot-cli alias -- "$0")"
+fi
+
 # Init the fuck
 if type thefuck > /dev/null; then
   eval "$(thefuck --alias)"
