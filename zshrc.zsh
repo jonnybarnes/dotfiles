@@ -72,17 +72,20 @@ chpwd_functions=( auto-ls $chpwd_functions )
 
 # Go Lang stuff
 export GOPATH=$HOME/go
-export PATH="$PATH:$(brew --prefix)/go/bin:$(brew --prefix)/opt/go/libexec/bin:$GOPATH/bin"
-
+if type brew &>/dev/null; then
+  export PATH="$PATH:$(brew --prefix)/go/bin:$(brew --prefix)/opt/go/libexec/bin:$GOPATH/bin"
+fi
 # GnuPG stuff
 GPG_TTY=`tty`
 export GPG_TTY
 
 # Add various GNU functions
-export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH"
-export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH"
-export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
-export PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH"
+if type brew &>/dev/null; then
+  export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH"
+  export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH"
+  export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
+  export PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH"
+fi
 
 # Add Totara Docker helper functions
 export PATH="$PATH:$HOME/git/totara-docker-dev/bin"
@@ -97,10 +100,14 @@ export PATH="$PATH:$HOME/.composer/vendor/bin"
 export PATH="$PATH:$HOME/.cargo/bin"
 
 # Ruby PATH
-export PATH="$PATH:$(brew --prefix)/opt/ruby/bin:$HOME/.gem/ruby/2.4.0/bin"
+if type brew &>/dev/null; then
+  export PATH="$PATH:$(brew --prefix)/opt/ruby/bin:$HOME/.gem/ruby/2.4.0/bin"
+fi
 
 # PostgreSQL binaries
-test -d $(brew --prefix)/pgsql && export PATH="$PATH:$(brew --prefix)/pgsql/bin"
+if type brew &>/dev/null; then
+  test -d $(brew --prefix)/pgsql && export PATH="$PATH:$(brew --prefix)/pgsql/bin"
+fi
 
 # PHP binaries
 test -d $HOME/.php/bin && export PATH="$PATH:$HOME/.php/bin"
@@ -112,7 +119,9 @@ test -d $HOME/Library/Python/3.7/bin && export PATH="$PATH:$HOME/Library/Python/
 test -d "$HOME/Library/Application Support/JetBrains/Toolbox/scripts" && export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
 # Homebrew cURL if we have it
-test -d $(brew --prefix)/opt/curl && export PATH="$(brew --prefix)/opt/curl/bin:$PATH"
+if type brew &>/dev/null; then
+  test -d $(brew --prefix)/opt/curl && export PATH="$(brew --prefix)/opt/curl/bin:$PATH"
+fi
 
 # Set Homebrew Env variables
 export HOMEBREW_NO_ANALYTICS=1
