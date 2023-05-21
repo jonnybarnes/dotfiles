@@ -132,6 +132,10 @@ test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_in
 # Source the untracked `extra` file
 test -e $HOME/.extra && source $HOME/.extra
 
+# You Should Use
+test -e /opt/homebrew/share/zsh-you-should-use/you-should-use.plugin.zsh && source /opt/homebrew/share/zsh-you-should-use/you-should-use.plugin.zsh
+test -e /usr/share/zsh/plugins/zsh-you-should-use/you-should-use.plugin.zsh && source /usr/share/zsh/plugins/zsh-you-should-use/you-should-use.plugin.zsh
+
 # Setup NVM
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
