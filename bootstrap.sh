@@ -16,6 +16,7 @@ test -d $HOME/.ncmpcpp || mkdir $HOME/.ncmpcpp
 test -L $HOME/.ncmpcpp/config || ln -f -s $BASEDIR/ncmpcpp $HOME/.ncmpcpp/config
 test -L $HOME/.tmux.conf || ln -f -s $BASEDIR/tmux $HOME/.tmux.conf
 test -L $HOME/.config/starship.toml || ln -f -s $BASEDIR/starship.toml $HOME/.config/starship.toml
+test -d $HOME/.sheldon || mkdir $HOME/.sheldon
 test -L $HOME/.sheldon/plugins.toml || ln -f -s $BASEDIR/sheldon.toml $HOME/.sheldon/plugins.toml
 test -L $HOME/.zsh || ln -f -s $BASEDIR/zsh $HOME/.zsh
 test -L $HOME/.zshrc || ln -f -s $BASEDIR/zshrc.zsh $HOME/.zshrc
