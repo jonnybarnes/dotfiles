@@ -165,6 +165,7 @@ fi
 
 # https://github.com/wfxr/forgit
 test -e $HOME/git/forgit/forgit.plugin.zsh && source $HOME/git/forgit/forgit.plugin.zsh
+test -e $HOME/git/forgit/completionsgit-forgit.zsh && source $HOME/git/forgit/completionsgit-forgit.zsh
 
 # McFly
 if type mcfly > /dev/null; then
