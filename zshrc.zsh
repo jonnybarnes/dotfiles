@@ -125,9 +125,6 @@ if type brew &>/dev/null; then
   test -d $(brew --prefix)/opt/curl && export PATH="$(brew --prefix)/opt/curl/bin:$PATH"
 fi
 
-# Set Homebrew Env variables
-export HOMEBREW_NO_ANALYTICS=1
-
 # Colourised output for `ls`
 export CLICOLOR=true
 export CLICOLOR_FORCE=true
