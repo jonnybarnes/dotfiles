@@ -54,10 +54,8 @@ source $HOME/.zsh/zsh-syntax-highlighting.zsh
 # ZSH history substring search
 source $HOME/.zsh/zsh-substring-search.zsh
 
-# For now disable auto-suggestions
-# iTerm2 nightly and fig really dont play nicely with it
 # ZSH autosuggestions
-#source $HOME/.zsh/zsh-autosuggestions.zsh
+source $HOME/.zsh/zsh-autosuggestions.zsh
 
 # Aliases
 source $HOME/.zsh/aliases.zsh
