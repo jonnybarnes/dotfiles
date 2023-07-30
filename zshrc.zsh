@@ -132,6 +132,9 @@ if type vivid &>/dev/null; then
   export LS_COLORS="$(vivid generate ayu)"
 fi
 
+# Set colour scheme got bat
+export BAT_THEME='OneHalfDark'
+
 # Source my own functions
 test -e $HOME/.zsh/functions.zsh && source $HOME/.zsh/functions.zsh
 
