@@ -171,6 +171,11 @@ if type mcfly > /dev/null; then
   eval "$(mcfly init zsh)"
 fi
 
+# ngrok completions
+if command -v ngrok &>/dev/null; then
+  eval "$(ngrok completion)"
+fi
+
 # Init starship prompt -- https://starship.rs
 eval "$(starship init zsh)"
 
