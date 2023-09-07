@@ -66,7 +66,7 @@ source $HOME/.zsh/aliases.zsh
 auto-ls () {
   emulate -L zsh;
 
-  exa --oneline --long --classify --icons --header
+  eza --oneline --long --classify --icons --header
 }
 chpwd_functions=( auto-ls $chpwd_functions )
 
