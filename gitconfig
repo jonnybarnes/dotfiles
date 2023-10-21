@@ -3,6 +3,7 @@
     # list aliases
     aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /' | sort
     bdm = "!git branch --merged | grep -v '*' | xargs -n 1 git branch -d"
+    default-branch = "!git symbolic-ref refs/remotes/origin/HEAD | cut -d'/' -f4"
     lg = log --graph --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ar)%Creset'
     lg2 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n' %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all
     lastchange = log -p --follow -n 1
