@@ -145,7 +145,9 @@ test -e /opt/homebrew/share/zsh-you-should-use/you-should-use.plugin.zsh && sour
 test -e /usr/share/zsh/plugins/zsh-you-should-use/you-should-use.plugin.zsh && source /usr/share/zsh/plugins/zsh-you-should-use/you-should-use.plugin.zsh
 
 # Setup Fast Node Manager
-eval "$(fnm env --use-on-cd)"
+if type fnm > /dev/null; then
+  eval "$(fnm env --use-on-cd)"
+fi
 
 # Setup GitHub Copilot
 if type github-copilot-cli > /dev/null; then
