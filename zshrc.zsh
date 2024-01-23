@@ -144,6 +144,9 @@ test -e $HOME/.extra && source $HOME/.extra
 test -e /opt/homebrew/share/zsh-you-should-use/you-should-use.plugin.zsh && source /opt/homebrew/share/zsh-you-should-use/you-should-use.plugin.zsh
 test -e /usr/share/zsh/plugins/zsh-you-should-use/you-should-use.plugin.zsh && source /usr/share/zsh/plugins/zsh-you-should-use/you-should-use.plugin.zsh
 
+# Setup Fast Node Manager
+eval "$(fnm env --use-on-cd)"
+
 # Setup GitHub Copilot
 if type github-copilot-cli > /dev/null; then
   eval "$(github-copilot-cli alias -- "$0")"
