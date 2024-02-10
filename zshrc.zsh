@@ -134,6 +134,10 @@ export BAT_THEME='OneHalfDark'
 # Source my own functions
 test -e $HOME/.zsh/functions.zsh && source $HOME/.zsh/functions.zsh
 
+# Setup fzf completions
+export FZF_COMPLETION_TRIGGER='~~'
+test -e $HOME/.zsh/fzf-completions.zsh && source $HOME/.zsh/fzf-completions.zsh
+
 # Source the iTerm2 shell integration
 test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
 
