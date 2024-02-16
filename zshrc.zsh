@@ -177,5 +177,10 @@ if command -v ngrok &>/dev/null; then
   eval "$(ngrok completion)"
 fi
 
+# zoxide - a better `cd` command
+if command -v zoxide &>/dev/null; then
+  eval "$(zoxide init zsh)"
+fi
+
 # Init starship prompt -- https://starship.rs
 eval "$(starship init zsh)"
