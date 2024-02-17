@@ -1,5 +1,4 @@
 [alias]
-
     # list aliases
     aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /' | sort
     bdm = "!git branch --merged | grep -v '*' | xargs -n 1 git branch -d"
@@ -13,19 +12,16 @@
     tlog = log --stat --since='1 Day Ago' --graph --pretty=oneline --abbrev-commit --date=relative
 
 [apply]
-
     # Detect whitespace errors when applying a patch
     whitespace = fix
 
 [filter "lfs"]
-
     # git-lfs stuff
     clean = git-lfs clean %f
     smudge = git-lfs smudge %f
     required = true
 
 [gpg]
-
     # Use OpenSSH to sign commits/tags/etc
     format = ssh
 
@@ -33,9 +29,11 @@
     allowedSignersFile = ~/.ssh/allowed_signers
 
 [help]
-
     # Automatically correct typos in commands
     autoCorrect = prompt
+
+[pull]
+    ff = only
 
 [core]
     pager = delta
@@ -44,7 +42,11 @@
     diffFilter = delta --color-only
 
 [delta]
-    navigate = true  # use n and N to move between diff sections
+    # use n and N to move between diff sections
+    navigate = true
+    side-by-side = true
+    hyperlinks = true
+    hyperlinks-file-link-format = "idea://open?file={path}&line={line}"
 
 [merge]
     conflictstyle = zdiff3
@@ -52,6 +54,12 @@
 [diff]
     algorithm = histogram
     colorMoved = default
+
+[tar "tar.xz"]
+    command = xz -c
+
+[tar "tar.zst"]
+    command = zstd -T0 -c
 
 [init]
     defaultBranch = main
