@@ -167,8 +167,12 @@ if type fnm > /dev/null; then
 fi
 
 # Setup GitHub Copilot
-if type github-copilot-cli > /dev/null; then
-  eval "$(github-copilot-cli alias -- "$0")"
+# first check we even have the genereic `gh` command
+if type gh > /dev/null; then
+  # Now check we have the copilot plugin installed with `gh`
+  if gh extension list | rg copilot -c > /dev/null; then
+    eval "$(gh copilot alias -- zsh)"
+  fi
 fi
 
 # Init the fuck
