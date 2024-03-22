@@ -41,8 +41,14 @@ fi
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/sbin:/usr/local/sbin:/usr/sbin:/sbin:$HOME/.local/bin:$PATH"
 export MANPATH="/opt/homebrew/manpages:/usr/local/man:$MANPATH"
 
+# Source my own functions
+source $HOME/.zsh/functions.zsh
+
 # Determine the running OS
 source $HOME/.zsh/platform.zsh
+
+# Detect system appearance
+export MACOS_APPEARANCE=`get-system-appearance`
 
 # ZSH syntax highlighting
 source $HOME/.zsh/zsh-syntax-highlighting.zsh
@@ -108,9 +114,6 @@ fi
 # PHP binaries
 test -d $HOME/.php/bin && export PATH="$PATH:$HOME/.php/bin"
 
-# macOS Python User binaries
-test -d $HOME/Library/Python/3.7/bin && export PATH="$PATH:$HOME/Library/Python/3.7/bin"
-
 # JetBrains Toolbox scripts
 test -d "$HOME/Library/Application Support/JetBrains/Toolbox/scripts" && export PATH="$PATH:$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 
@@ -120,19 +123,29 @@ if type brew &>/dev/null; then
 fi
 
 # Colourised output for `ls`
-export CLICOLOR=true
-export CLICOLOR_FORCE=true
-export LSCOLORS='dxfxcxdxbxegedabagacad'
-export LS_COLORS='di=33;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=0;42:ow=0;43:'
+# export CLICOLOR=true
+# export CLICOLOR_FORCE=true
+# export LSCOLORS='dxfxcxdxbxegedabagacad'
+# export LS_COLORS='di=33;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=0;42:ow=0;43:'
+# vivid Dark mode   ayu
+# vivid Light mode  snazzy
 if type vivid &>/dev/null; then
-  export LS_COLORS="$(vivid generate ayu)"
+  local vividTheme="ayu"
+  if [[ $MACOS_APPEARANCE == "light" ]]; then
+    vividTheme="snazzy"
+  fi
+  
+  export LS_COLORS="$(vivid generate $vividTheme)"
 fi
 
 # Set colour scheme got bat
-export BAT_THEME='OneHalfDark'
-
-# Source my own functions
-test -e $HOME/.zsh/functions.zsh && source $HOME/.zsh/functions.zsh
+# bat Dark mode   OneHalfDark
+# bat Light mode  Coldark-Dark
+local batTheme="OneHalfDark"
+if [[ $MACOS_APPEARANCE == "light" ]]; then
+  batTheme="Coldark-Dark"
+fi
+export BAT_THEME=$batTheme
 
 # Setup fzf completions
 export FZF_COMPLETION_TRIGGER='~~'
@@ -184,3 +197,7 @@ fi
 
 # Init starship prompt -- https://starship.rs
 eval "$(starship init zsh)"
+
+# Finally we can have zsh auto source this rc file on command
+# attribution: https://www.reddit.com/r/commandline/comments/12g76v/
+trap "source $HOME/.zshrc" USR1
