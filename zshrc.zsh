@@ -143,7 +143,7 @@ fi
 # bat Light mode  Coldark-Dark
 local batTheme="OneHalfDark"
 if [[ $MACOS_APPEARANCE == "light" ]]; then
-  batTheme="Coldark-Dark"
+  batTheme="base16-256"
 fi
 export BAT_THEME=$batTheme
 
