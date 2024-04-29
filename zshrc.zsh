@@ -38,8 +38,13 @@ if [[ -f /usr/libexec/path_helper ]]; then
 fi
 
 # Add our own dirs to the $PATH
-export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/opt/homebrew/sbin:/usr/local/sbin:/usr/sbin:/sbin:$HOME/.local/bin:$PATH"
-export MANPATH="/opt/homebrew/manpages:/usr/local/man:$MANPATH"
+if [[ -f /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew  shellenv)"
+fi
+if [[ -f /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew  shellenv)"
+fi
+export PATH="$HOME/.local/bin:$PATH"
 
 # Source my own functions
 source $HOME/.zsh/functions.zsh
@@ -132,7 +137,7 @@ fi
 if type vivid &>/dev/null; then
   local vividTheme="ayu"
   if [[ $MACOS_APPEARANCE == "light" ]]; then
-    vividTheme="snazzy"
+    vividTheme="catppuccin-latte"
   fi
   
   export LS_COLORS="$(vivid generate $vividTheme)"
@@ -149,7 +154,9 @@ export BAT_THEME=$batTheme
 
 # Setup fzf completions
 export FZF_COMPLETION_TRIGGER='~~'
-test -e $HOME/.zsh/fzf-completions.zsh && source $HOME/.zsh/fzf-completions.zsh
+if type fzf > /dev/null; then
+  eval "$(fzf --zsh)"
+fi
 
 # Source the iTerm2 shell integration
 test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
