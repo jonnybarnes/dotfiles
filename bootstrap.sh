@@ -21,6 +21,16 @@ test -L $HOME/.sheldon/plugins.toml || ln -f -s $BASEDIR/sheldon.toml $HOME/.she
 test -L $HOME/.zsh || ln -f -s $BASEDIR/zsh $HOME/.zsh
 test -L $HOME/.zshrc || ln -f -s $BASEDIR/zshrc.zsh $HOME/.zshrc
 
+# setup gpg conf
+test -d $HOME/.gnupg || mkdir $HOME/.gnupg
+cp -f $BASEDIR/gnupg/common.conf $HOME/.gnupg/common.conf
+cp -f $BASEDIR/gnupg/dirmngr.conf $HOME/.gnupg/dirmngr.conf
+cp -f $BASEDIR/gnupg/gpg.conf $HOME/.gnupg/gpg.conf
+chmod 700 $HOME/.gnupg
+chmod 640 $HOME/.gnupg/common.conf
+chmod 640 $HOME/.gnupg/dirmngr.conf
+chmod 640 $HOME/.gnupg/gpg.conf
+
 # ln vim files
 echo "Setting up vim"
 test -d $HOME/.vim && rm -rf $HOME/.vim
