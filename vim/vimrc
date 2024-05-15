@@ -172,18 +172,18 @@ nnoremap <C-L> :nohl<CR><C-L>
 " Add the powerline statusbar
 
 " Linux
-if (filereadable("/usr/lib/python3.6/site-packages/powerline/bindings/vim/__init__.py"))
-    set rtp+=/usr/lib/python3.6/site-packages/powerline/bindings/vim
-endif
+"if (filereadable("/usr/lib/python3.6/site-packages/powerline/bindings/vim/__init__.py"))
+""    set rtp+=/usr/lib/python3.6/site-packages/powerline/bindings/vim
+"endif
 " macOS
-if (filereadable("/usr/local/lib/python3.6/site-packages/powerline/bindings/vim/__init__.py"))
-    set rtp+=/usr/local/lib/python3.6/site-packages/powerline/bindings/vim
-endif
+"if (filereadable("/usr/local/lib/python3.6/site-packages/powerline/bindings/vim/__init__.py"))
+""    set rtp+=/usr/local/lib/python3.6/site-packages/powerline/bindings/vim
+"endif
 " JMB server
-if (filereadable("/home/jonny/.local/lib/python3.5/site-packages/powerline/bindings/vim/__init__.py"))
-    set rtp+=/home/jonny/.local/lib/python3.5/site-packages/powerline/bindings/vim
-endif
-let g:powerline_pycmd = "py3"
+"if (filereadable("/home/jonny/.local/lib/python3.5/site-packages/powerline/bindings/vim/__init__.py"))
+""    set rtp+=/home/jonny/.local/lib/python3.5/site-packages/powerline/bindings/vim
+"endif
+"let g:powerline_pycmd = "py3"
 
 "------------------------------------------------------------
 " Personal settings
@@ -193,12 +193,12 @@ execute pathogen#helptags()
 
 
 " Colour schemes
-set background=dark
+"set background=dark
 "let g:solarized_termtrans=1
 "let g:solarized_termcolors=256
 "let g:solarized_contrast="high"
 "let g:solarized_visibilty="high"
-"colorscheme solarized
+colorscheme gruvbox
 
 
 " syntastic settings from the readme
