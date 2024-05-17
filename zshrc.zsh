@@ -70,12 +70,12 @@ source $HOME/.zsh/aliases.zsh
 # credit Paul Irish: https://github.com/paulirish/dotfiles/blob/606d85f083eb53853789ce9dcaf31a49756471bd/.zshrc#L80
 # Automatically list directory contents on `cd`.
 # Switched to using `exa` instead of `ls`.
-auto-ls () {
+ezacd () {
   emulate -L zsh;
 
   eza --oneline --long --classify --icons --header
 }
-chpwd_functions=( auto-ls $chpwd_functions )
+chpwd_functions=(${chpwd_functions[@]} "ezacd")
 
 # Go Lang stuff
 export GOPATH=$HOME/go
