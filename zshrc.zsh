@@ -26,7 +26,7 @@ zstyle ':completion:*' rehash true
 export LANG=en_GB.UTF-8
 
 # Preferred editor for local and remote sessions
-export EDITOR='vim'
+export EDITOR='nvim'
 
 # Set the DEFAULT_USER variable to me (jonny)
 export DEFAULT_USER="jonny"
