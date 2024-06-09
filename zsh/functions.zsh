@@ -28,13 +28,6 @@ gencert () {
   echo 'Certs generated for $DOMAIN'
 }
 
-# Generate a random 7 digit number, used for CCL’s ImKeys
-imkey () {
-  imkey=$(shuf -i 1111111-9999999 -n1)
-
-  echo $imkey
-}
-
 # Delete branches selected via fzf
 delete-branches () {
   git branch |
@@ -56,13 +49,13 @@ function pr-checkout() {
   local pr_number
 
   pr_number=$(
-      gh api 'repos/:owner/:repo/pulls' --jq '.[] | "#\(.number) \(.title)"' |
-          fzf |
-          sd '^\#(\d+)\s.*' '$1'
+    gh api 'repos/:owner/:repo/pulls' --jq '.[] | "#\(.number) \(.title)"' |
+      fzf |
+      sd '^\#(\d+)\s.*' '$1'
   )
 
   if [ -n "$pr_number" ]; then
-      gh pr checkout "$pr_number"
+    gh pr checkout "$pr_number"
   fi
 }
 
@@ -83,7 +76,7 @@ function get-temporary-directory() {
 function start-proxy() {
   if [ -z "$SSH_PROXY_HOST" ]; then
     echo "SSH_PROXY_HOST is not set or empty"
-    
+
     return
   fi
 

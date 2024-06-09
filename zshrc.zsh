@@ -145,7 +145,7 @@ fi
 
 # Set colour scheme got bat
 # bat Dark mode   OneHalfDark
-# bat Light mode  Coldark-Dark
+# bat Light mode  gruvbox-light
 local batTheme="OneHalfDark"
 if [[ $MACOS_APPEARANCE == "light" ]]; then
   batTheme="gruvbox-light"
