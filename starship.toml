@@ -31,8 +31,7 @@ $scala\
 """
 
 right_format = """
-[\uE0B2](fg:bar_three)\
-$time\
+$cmd_duration\
 """
 
 palette = 'theme'
@@ -93,7 +92,7 @@ Windows = '󰍲'
 
 [directory]
 truncation_length = 0
-truncation_symbol = '.../'
+truncation_symbol = '…/'
 truncate_to_repo = false
 fish_style_pwd_dir_length = 1
 style = 'bold fg:text_two bg:bar_two'
@@ -209,8 +208,5 @@ symbol = ' '
 style = 'fg:text_three bg:bar_four'
 format = '[ $symbol ($version) ]($style)'
 
-[time]
-disabled = false
-time_format = '%R'                   # Hour:Minute Format
-style = 'fg:text_three bg:bar_three'
-format = '[   $time ]($style)'
+[cmd_duration]
+style = 'bold red'

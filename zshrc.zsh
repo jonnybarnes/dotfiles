@@ -207,7 +207,10 @@ if command -v zoxide &>/dev/null; then
 fi
 
 # Init starship prompt -- https://starship.rs
-eval "$(starship init zsh)"
+#eval "$(starship init zsh)"
+
+# Oh My Posh
+eval "$(oh-my-posh init zsh --config $HOME/.config/jmb.omp.toml)"
 
 # Finally we can have zsh auto source this rc file on command
 # attribution: https://www.reddit.com/r/commandline/comments/12g76v/
