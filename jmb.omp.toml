@@ -1,6 +1,7 @@
 #:schema https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json
 
 version = 2
+final_space = true
 console_title_template = '{{ .Folder }}'
 
 [[blocks]]
@@ -62,7 +63,7 @@ console_title_template = '{{ .Folder }}'
     style = "diamond"
     leading_diamond = ''
     trailing_diamond = ''
-    foreground = "red"
+    foreground = "lightRed"
     background = "black"
     template = "󱦟 {{ .FormattedMs }} "
 
@@ -86,3 +87,12 @@ console_title_template = '{{ .Folder }}'
     style = 'plain'
     foreground = 'default'
     template = ' '
+
+[transient_prompt]
+  foreground_templates = [
+    "{{if gt .Code 0}}red{{end}}",
+    "{{if eq .Code 0}}default{{end}}",
+  ]
+  background = 'transparent'
+  template = '$ '
+
