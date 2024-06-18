@@ -41,6 +41,7 @@ console_title_template = '{{ .Folder }}'
       fetch_stash_count = true
       fetch_status = true
       fetch_upstream_icon = true
+      branch_icon = ' '
 
   [[blocks.segments]]
     type = 'status'
