@@ -1,66 +1,73 @@
 #!/usr/bin/env zsh
 
-# Install Homebrew stuff
-brew tap homebrew/services
-brew tap tldr-pages/tldr
+# Check brew is installed first
+if ! (( $+commands[brew] ))
+then
+    echo "Homebrew not installed yet"
+    exit 1
+fi
 
 # update brew, and upgrade already installed formulae
 brew update
 brew upgrade
 
-# Install GNU coreutils, (OS X ships with outdated versions)
+# Install GNU coreutils, (macOS ships with outdated versions)
 brew install coreutils
-ln -s /usr/local/bin/gsha256sum /usr/local/bin/sha256sum
 
 # Install more system utilities
 brew install moreutils findutils
 # Install GNU `sed`
 brew install gnu-sed --with-default-names
 
-# Install wget with IRI support
-brew install wget --with-iri
-
-# Install more recent versions of some OS X tools.
-brew install vim --with-override-system-vi
+# Install more recent versions of some macOS tools.
+brew install vim
+brew install curl
 brew install grep
 brew install openssh
 
 # Install zsh and addons
 brew install zsh
+brew install zsh-autosuggestions
 brew install zsh-completions
+brew install zsh-history-substring-search
 brew install zsh-syntax-highlighting
 
 # Install other useful utilities
 brew install ack
+brew install age
+brew install awscli
+brew install bat
+brew install oven-sh/bun/bun
+brew install diff-so-fancy
+brew install eza
+brew install fd
+brew install ffmpeg
+brew install fnm
+brew install fzf
+brew install gh
 brew install git
 brew install git-lfs
-brew install diff-so-fancy
 brew install gnupg
-brew install hub
-brew install imagemagick --with-webp --with-libheif
-brew install lua
-brew install lynx
-brew install openssl@1.1
+brew install hexyl
+brew install imagemagick
+brew install lazygit
+brew install mcfly
+brew install neovim
+brew install oh-my-posh
 brew install p7zip
 brew install pcre
-brew install python
+brew install ripgrep
+brew install rm-improved
+brew install ruby
+brew install sheldon
+brew install starship
 brew install sqlite
+brew install thefuck
+brew install vivid
+brew install wget
 brew install xz
 brew install zopfli
-
-# Install WebDev packages
-brew install nginx
-brew install mariadb
-brew install postgresql
-brew install postgis
-brew install php
-brew install node
-
-# Radnom packages
-brew install ffmpeg
-brew install go
-brew install ruby
-brew install youtube-dl
+brew install zoxide
 
 # Remove outdated versions from the Cellar
 brew cleanup
