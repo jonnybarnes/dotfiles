@@ -11,8 +11,6 @@ git submodule init && git submodule update
 echo "Sym-linking the various config files"
 test -L $HOME/.gitignore || ln -f -s $BASEDIR/gitignore $HOME/.gitignore
 test -L $HOME/.hushlogin || ln -f -s $BASEDIR/hushlogin $HOME/.hushlogin
-test -d $HOME/.ncmpcpp || mkdir $HOME/.ncmpcpp
-test -L $HOME/.ncmpcpp/config || ln -f -s $BASEDIR/ncmpcpp $HOME/.ncmpcpp/config
 test -L $HOME/.tmux.conf || ln -f -s $BASEDIR/tmux $HOME/.tmux.conf
 test -L $HOME/.config/starship.toml || ln -f -s $BASEDIR/starship.toml $HOME/.config/starship.toml
 test -L $HOME/.config/jmb.omp.toml || ln -f -s $BASEDIR/jmb.omp.toml $HOME/.config/jmb.omp.toml
