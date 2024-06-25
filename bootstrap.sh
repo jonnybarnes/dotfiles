@@ -9,7 +9,6 @@ git submodule init && git submodule update
 
 # ln the various files
 echo "Sym-linking the various config files"
-test -L $HOME/.curlrc || ln -f -s $BASEDIR/curlrc $HOME/.curlrc
 test -L $HOME/.gitignore || ln -f -s $BASEDIR/gitignore $HOME/.gitignore
 test -L $HOME/.hushlogin || ln -f -s $BASEDIR/hushlogin $HOME/.hushlogin
 test -d $HOME/.ncmpcpp || mkdir $HOME/.ncmpcpp
