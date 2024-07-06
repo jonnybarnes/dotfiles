@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
 # zoxide - a better `cd` command
-if command -v zoxide &>/dev/null; then
+if (( ${+commands[zoxide]} )); then
   eval "$(zoxide init zsh)"
 fi

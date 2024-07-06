@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
 # Setup fzf completions
-if type fzf > /dev/null; then
+if (( ${+commands[fzf]} )); then
   eval "$(fzf --zsh)"
 fi

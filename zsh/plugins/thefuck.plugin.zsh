@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
 # Init the fuck
-if type thefuck > /dev/null; then
+if (( ${+commands[thefuck]} )); then
   eval "$(thefuck --alias)"
 fi

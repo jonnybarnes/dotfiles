@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
 # McFly
-if type mcfly > /dev/null; then
+if (( ${+commands[mcfly]} )); then
   eval "$(mcfly init zsh)"
 fi
