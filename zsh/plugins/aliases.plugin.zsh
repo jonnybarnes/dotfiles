@@ -12,3 +12,6 @@ alias als="eza --oneline --long --classify --icons --header"
 
 # Laravel Sail
 alias sail="[ -f sail ] && bash sail || bash vendor/bin/sail"
+
+# Add git aliases
+alias gs="git status"
