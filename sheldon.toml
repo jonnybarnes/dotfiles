@@ -1,24 +1,56 @@
-# `sheldon` configuration file
-# ----------------------------
+# Sheldon configuration file
 #
-# You can modify this file directly or you can use one of the following
-# `sheldon` commands which are provided to assist in editing the config file:
+# See https://sheldon.cli.rs
 #
-# - `sheldon add` to add a new plugin to the config file
-# - `sheldon edit` to open up the config file in the default editor
-# - `sheldon remove` to remove a plugin from the config file
-#
-# See the documentation for more https://github.com/rossmacarthur/sheldon#readme
+# Also heavily inspired by https://github.com/rossmacarthur/dotfiles/tree/trunk
 
 shell = "zsh"
 
 [templates]
-defer = { value = 'zsh-defer source "{{ file }}"', each = true }
+defer = """{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source "{{ file }}"\n{% endfor %}{{ hooks?.post | nl }}"""
+defer-more = """{{ hooks?.pre | nl }}{% for file in files %}zsh-defer -t 0.5 source "{{ file }}"\n{% endfor %}{{ hooks?.post | nl }}"""
 
-[plugins]
+# Loading indicator
+# -----------------
+
+[plugins.show]
+local = "~/.zsh/plugins/loading"
+
+# Completions
+# -----------
+
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+
+# Sourced
+# -------
 
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
+
+[plugins.iterm2-shell-integration]
+remote = "https://iterm2.com/shell_integration/zsh"
+
+# Some of the functions may get used elsewhere
+# so we do not defer loading
+[plugins.functions]
+local = "~/.zsh/plugins"
+
+# Deferred plugins
+# ----------------
+
+[plugins.aliases]
+local = "~/.zsh/plugins"
+apply = ["defer"]
+
+[plugins.fzf]
+github = "junegunn/fzf"
+use = ["shell/completion.zsh", "shell/key-bindings.zsh"]
+apply = ["defer"]
+
+[plugins.fzf-completions]
+local = "~/.zsh/plugins"
+apply = ["defer"]
 
 [plugins.zsh-syntax-highlighting]
 github = "zsh-users/zsh-syntax-highlighting"
@@ -32,3 +64,51 @@ apply = ["defer"]
 github = "zsh-users/zsh-autosuggestions"
 apply = ["defer"]
 use = ["{{ name }}.zsh"]
+
+[plugins.zsh-you-should-use]
+github = "MichaelAquilina/zsh-you-should-use"
+apply = ["defer"]
+hooks.pre = "export YSU_MODE=ALL"
+
+[plugins.forgit]
+github = "wfxr/forgit"
+apply = ["defer"]
+
+[plugins.fnm]
+local = "~/.zsh/plugins"
+apply = ["defer"]
+
+[plugins.zoxide]
+local = "~/.zsh/plugins"
+apply = ["defer"]
+
+[plugins.mcfly]
+local = "~/.zsh/plugins"
+apply = ["defer"]
+
+[plugins.thefuck]
+local = "~/.zsh/plugins"
+apply = ["defer"]
+
+# This works best if it is placed last.
+[plugins.compinit]
+local = "~/.zsh/plugins"
+apply = ["defer"]
+
+# Plugins that are even more deferred
+# -----------------------------------
+
+[plugins.github-copilot]
+local = "~/.zsh/plugins"
+apply = ["defer-more"]
+
+[plugins.ngrok]
+local = "~/.zsh/plugins"
+apply = ["defer-more"]
+
+# Loading indicator
+# -----------------
+
+[plugins.hide]
+local = "~/.zsh/plugins/loading"
+apply = ["defer-more"]

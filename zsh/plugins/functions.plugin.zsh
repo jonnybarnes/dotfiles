@@ -2,34 +2,8 @@
 
 # Functions
 
-# Generate TLS certs using a local CA
-gencert () {
-  DOMAIN=$1
-
-  test -d /usr/local/opt/openssl@1.1/bin && PATH='/usr/local/opt/openssl@1.1/bin':$PATH
-  test -d /opt/homebrew/opt/openssl@1.1/bin && PATH='/opt/homebrew/opt/openssl@1.1/bin':$PATH
-  test -f /usr/local/etc/openssl@1.1/openssl.cnf && SSLCNF='/usr/local/etc/openssl@1.1/openssl.cnf'
-  test -f /opt/homebrew/etc/openssl@1.1/openssl.cnf && SSLCNF='/opt/homebrew/etc/openssl@1.1/openssl.cnf'
-  test -f /etc/ssl/openssl.cnf && SSLCNF='/etc/ssl/openssl.cnf'
-
-  cd $HOME/git/ca
-  [[ ! -d $DOMAIN ]] && mkdir $DOMAIN
-  cd $DOMAIN
-  [[ -f key ]] && mv key key.bak
-  [[ -f csr ]] && mv csr csr.bak
-  [[ -f crt ]] && mv crt crt.bak
-
-  openssl ecparam -name secp384r1 -genkey -noout -out key
-  chmod 644 key
-  openssl req -new -sha256 -key key -subj "/C=UK/ST=England/L=Bury/O=JMB Dev Ltd/CN=$DOMAIN" -reqexts SAN -config <(cat $SSLCNF <(printf "[SAN]\nsubjectAltName=DNS:$DOMAIN")) -out csr
-  openssl x509 -req -in csr -extfile <(cat $SSLCNF <(printf "[SAN]\nsubjectAltName=DNS:$DOMAIN")) -extensions SAN -CA ../jmb-ca-ecc.pem -CAkey ../jmb-ca-ecc.key -CAcreateserial -days 90 -sha256 -out crt
-
-  cd $HOME/git/ca
-  echo 'Certs generated for $DOMAIN'
-}
-
 # Delete branches selected via fzf
-delete-branches () {
+function delete-branches() {
   git branch |
     grep --invert-match '\*' | # Remove current branch
     fzf --multi --preview="git log {..}" |
@@ -37,7 +11,7 @@ delete-branches () {
 }
 
 # Delete branches selected via fzf (force the deletion)
-delete-branches-force () {
+function delete-branches-force() {
   git branch |
     grep --invert-match '\*' | # Remove current branch
     fzf --multi --preview="git log {..}" |

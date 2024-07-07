@@ -14,8 +14,8 @@ test -L $HOME/.hushlogin || ln -f -s $BASEDIR/hushlogin $HOME/.hushlogin
 test -L $HOME/.tmux.conf || ln -f -s $BASEDIR/tmux $HOME/.tmux.conf
 test -L $HOME/.config/starship.toml || ln -f -s $BASEDIR/starship.toml $HOME/.config/starship.toml
 test -L $HOME/.config/jmb.omp.toml || ln -f -s $BASEDIR/jmb.omp.toml $HOME/.config/jmb.omp.toml
-test -d $HOME/.sheldon || mkdir $HOME/.sheldon
-test -L $HOME/.sheldon/plugins.toml || ln -f -s $BASEDIR/sheldon.toml $HOME/.sheldon/plugins.toml
+test -d $HOME/.config/sheldon || mkdir $HOME/.config/sheldon
+test -L $HOME/.config/sheldon/plugins.toml || ln -f -s $BASEDIR/sheldon.toml $HOME/.config/sheldon/plugins.toml
 test -L $HOME/.zsh || ln -f -s $BASEDIR/zsh $HOME/.zsh
 test -L $HOME/.zshrc || ln -f -s $BASEDIR/zshrc.zsh $HOME/.zshrc
 

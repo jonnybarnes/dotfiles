@@ -56,8 +56,15 @@ console_title_template = '{{ .Folder }}'
       always_enabled = true
 
 [[blocks]]
-  type = 'prompt'
-  alignment = 'right'
+  type = 'rprompt'
+  alignment = 'left'
+
+  [[blocks.segments]]
+    type = "text"
+    style = "plain"
+    foreground = "black"
+    background = "transparent"
+    template = "{{ if .Env.SHELL_LOADING }} loading {{ end }}"
 
   [[blocks.segments]]
     type = "executiontime"
