@@ -43,6 +43,15 @@ local = "~/.zsh/plugins"
 local = "~/.zsh/plugins"
 apply = ["defer"]
 
+[plugins.fzf]
+github = "junegunn/fzf"
+use = ["shell/completion.zsh", "shell/key-bindings.zsh"]
+apply = ["defer"]
+
+[plugins.fzf-completions]
+local = "~/.zsh/plugins"
+apply = ["defer"]
+
 [plugins.zsh-syntax-highlighting]
 github = "zsh-users/zsh-syntax-highlighting"
 apply = ["defer"]
@@ -80,11 +89,6 @@ apply = ["defer"]
 [plugins.thefuck]
 local = "~/.zsh/plugins"
 apply = ["defer"]
-
-[plugins.fzf]
-local = "~/.zsh/plugins"
-apply = ["defer"]
-hooks.pre = "export FZF_COMPLETION_TRIGGER='~~'"
 
 # This works best if it is placed last.
 [plugins.compinit]

@@ -1,6 +1,4 @@
-# fzf completions
-test -e /opt/homebrew/opt/fzf/shell/completion.zsh && source /opt/homebrew/opt/fzf/shell/completion.zsh
-test -e /usr/share/fzf/completion.zsh && source /usr/share/fzf/completion.zsh
+#!/usr/bin/env zsh
 
 # cURL completions copied from https://blog.revathskumar.com/2024/02/curl-fuzzy-search-options-using-fzf.html
 _fzf_complete_curl() {
