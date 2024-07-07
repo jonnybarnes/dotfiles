@@ -10,6 +10,11 @@ shell = "zsh"
 defer = """{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source "{{ file }}"\n{% endfor %}{{ hooks?.post | nl }}"""
 defer-more = """{{ hooks?.pre | nl }}{% for file in files %}zsh-defer -t 0.5 source "{{ file }}"\n{% endfor %}{{ hooks?.post | nl }}"""
 
+# Loading indicator
+# -----------------
+
+[plugins.show]
+local = "~/.zsh/plugins/loading"
 
 # Completions
 # -----------
@@ -95,4 +100,11 @@ apply = ["defer-more"]
 
 [plugins.ngrok]
 local = "~/.zsh/plugins"
+apply = ["defer-more"]
+
+# Loading indicator
+# -----------------
+
+[plugins.hide]
+local = "~/.zsh/plugins/loading"
 apply = ["defer-more"]
