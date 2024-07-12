@@ -22,3 +22,12 @@
 [submodule "vim/bundle/gruvbox"]
 	path = vim/bundle/gruvbox
 	url = https://github.com/morhetz/gruvbox.git
+[submodule "neovim/pack/vendor/start/oil.nvim"]
+	path = neovim/pack/vendor/start/oil.nvim
+	url = https://github.com/stevearc/oil.nvim
+[submodule "neovim/pack/vendor/start/nvim-web-devicons"]
+	path = neovim/pack/vendor/start/nvim-web-devicons
+	url = https://github.com/nvim-tree/nvim-web-devicons
+[submodule "neovim/pack/vendor/start/gitsigns.nvim"]
+	path = neovim/pack/vendor/start/gitsigns.nvim
+	url = https://github.com/lewis6991/gitsigns.nvim

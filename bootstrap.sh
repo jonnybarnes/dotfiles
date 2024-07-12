@@ -35,6 +35,10 @@ test -d $HOME/.vim && rm -rf $HOME/.vim
 ln -s $BASEDIR/vim $HOME/.vim
 test -L $HOME/.vimrc || ln -f -s $HOME/.vim/vimrc $HOME/.vimrc
 
+echo "Setting up NeoVim"
+test -d $HOME/.config/nvim && rm -rf $HOME/.config/nvim
+ln -s $BASEDIR/neovim $HOME/.config/nvim
+
 # .gitconfig gets edited by .extra so we won’t symlink it, but copy it
 echo "For compatability we chall copy the global gitconfig"
 cp $BASEDIR/gitconfig $HOME/.gitconfig
