@@ -119,10 +119,33 @@ export BAT_THEME=$batTheme
 # Source the untracked `extra` file
 test -e $HOME/.extra && source $HOME/.extra
 
-# Oh My Posh
-if (( ${+commands[oh-my-posh]} )); then
-  eval "$(oh-my-posh init zsh --config $HOME/.config/jmb.omp.toml)"
-fi
+# Set the prompt
+# We need zsh git integration
+# Autoload zsh's `add-zsh-hook` and `vcs_info` functions
+# (-U autoload w/o substition, -z use zsh style)
+autoload -Uz add-zsh-hook vcs_info
+
+# Set prompt substitution so we can use the vcs_info_message variable
+setopt prompt_subst
+
+# Run the `vcs_info` hook to grab git info before displaying the prompt
+add-zsh-hook precmd vcs_info
+
+# Style the vcs_info message
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:git*' formats '%b%u%c'
+# Format when the repo is in an action (merge, rebase, etc)
+zstyle ':vcs_info:git*' actionformats '%F{14}⏱ %*%f'
+zstyle ':vcs_info:git*' unstagedstr '*'
+zstyle ':vcs_info:git*' stagedstr '+'
+# This enables %u and %c (unstaged/staged changes) to work,
+# but can be slow on large repos
+zstyle ':vcs_info:*:*' check-for-changes true
+
+# Set the right prompt to the vcs_info message
+RPROMPT='%F{8}⎇ ${vcs_info_msg_0_}'
+
+PROMPT='%(?.%F{blue}⏺.%F{red}⏺)%f %2~ %(!.#.$) '
 
 # Finally we can have zsh auto source this rc file on command
 # attribution: https://www.reddit.com/r/commandline/comments/12g76v/
