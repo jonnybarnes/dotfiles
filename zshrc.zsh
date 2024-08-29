@@ -145,7 +145,23 @@ zstyle ':vcs_info:*:*' check-for-changes true
 # Set the right prompt to the vcs_info message
 RPROMPT='%F{8}${vcs_info_msg_0_}'
 
-PROMPT='%(?.%F{blue}⏺.%F{red}⏺)%f %2~ %(!.#.$) '
+# First set a dot that changes colour on success/fail or previous command
+PROMPT='%(?.%F{blue}⏺.%F{red}⏺)%f '
+# Show a symbol for the OS
+# First we set the os_symbol variable we will use in the prompt
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    os_symbol=""
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    os_symbol="󰣇"
+else
+    os_symbol=""  # Fallback symbol if OS is neither macOS nor Linux
+fi
+
+PROMPT+='${os_symbol} '
+# Then show the working directory
+PROMPT+='%2~ '
+# Finally we can adjust the prompt to show if we are a user or sudo
+PROMPT+='%(!.#.$) '
 
 # Finally we can have zsh auto source this rc file on command
 # attribution: https://www.reddit.com/r/commandline/comments/12g76v/
