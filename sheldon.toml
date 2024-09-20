@@ -86,10 +86,6 @@ apply = ["defer"]
 local = "~/.zsh/plugins"
 apply = ["defer"]
 
-[plugins.thefuck]
-local = "~/.zsh/plugins"
-apply = ["defer"]
-
 # This works best if it is placed last.
 [plugins.compinit]
 local = "~/.zsh/plugins"
@@ -97,10 +93,6 @@ apply = ["defer"]
 
 # Plugins that are even more deferred
 # -----------------------------------
-
-[plugins.github-copilot]
-local = "~/.zsh/plugins"
-apply = ["defer-more"]
 
 [plugins.ngrok]
 local = "~/.zsh/plugins"
