@@ -142,8 +142,11 @@ zstyle ':vcs_info:git*' stagedstr '+'
 # but can be slow on large repos
 zstyle ':vcs_info:*:*' check-for-changes true
 
-# Set the right prompt to the vcs_info message
-RPROMPT='%F{8}${vcs_info_msg_0_}'
+# First show the Loading indicator in the right prompt if shell plugins are still loading
+RPROMPT='%F{8}$(if [[ -n $SHELL_LOADING ]]; then echo "Loading... "; fi)'
+
+# Then we can also show the git branch
+RPROMPT+='${vcs_info_msg_0_}'
 
 # First set a dot that changes colour on success/fail or previous command
 PROMPT='%(?.%F{blue}⏺.%F{red}⏺)%f '
