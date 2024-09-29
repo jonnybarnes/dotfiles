@@ -19,6 +19,9 @@ local = "~/.zsh/plugins/loading"
 # Completions
 # -----------
 
+[plugins.fzf-tab]
+github = "Aloxaf/fzf-tab"
+
 [plugins.zsh-completions]
 github = "zsh-users/zsh-completions"
 
