@@ -31,3 +31,6 @@
 [submodule "neovim/pack/vendor/start/gitsigns.nvim"]
 	path = neovim/pack/vendor/start/gitsigns.nvim
 	url = https://github.com/lewis6991/gitsigns.nvim
+[submodule "neovim/pack/vendor/start/nvim-lspconfig"]
+	path = neovim/pack/vendor/start/nvim-lspconfig
+	url = https://github.com/neovim/nvim-lspconfig
