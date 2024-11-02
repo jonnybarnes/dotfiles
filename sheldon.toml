@@ -94,13 +94,6 @@ apply = ["defer"]
 local = "~/.zsh/plugins"
 apply = ["defer"]
 
-# Plugins that are even more deferred
-# -----------------------------------
-
-[plugins.ngrok]
-local = "~/.zsh/plugins"
-apply = ["defer-more"]
-
 # Loading indicator
 # -----------------
 
