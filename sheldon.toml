@@ -19,6 +19,9 @@ local = "~/.zsh/plugins/loading"
 # Completions
 # -----------
 
+[plugins.fzf-tab]
+github = "Aloxaf/fzf-tab"
+
 [plugins.zsh-completions]
 github = "zsh-users/zsh-completions"
 
@@ -90,13 +93,6 @@ apply = ["defer"]
 [plugins.compinit]
 local = "~/.zsh/plugins"
 apply = ["defer"]
-
-# Plugins that are even more deferred
-# -----------------------------------
-
-[plugins.ngrok]
-local = "~/.zsh/plugins"
-apply = ["defer-more"]
 
 # Loading indicator
 # -----------------
