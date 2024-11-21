@@ -34,3 +34,6 @@
 [submodule "neovim/pack/vendor/start/nvim-lspconfig"]
 	path = neovim/pack/vendor/start/nvim-lspconfig
 	url = https://github.com/neovim/nvim-lspconfig
+[submodule "neovim/pack/vendor/start/nvim-tree"]
+	path = neovim/pack/vendor/start/nvim-tree
+	url = https://github.com/nvim-tree/nvim-tree.lua.git
