@@ -19,6 +19,11 @@ test -L $HOME/.config/sheldon/plugins.toml || ln -f -s $BASEDIR/sheldon.toml $HO
 test -L $HOME/.zsh || ln -f -s $BASEDIR/zsh $HOME/.zsh
 test -L $HOME/.zshrc || ln -f -s $BASEDIR/zshrc.zsh $HOME/.zshrc
 
+# If ghostty is installed on the system then setup the config
+if (( ${+commands[ghostty]} )); then
+  test -L $HOME/Library/Application\ Support/com.mitchellh.ghostty/config || ln -f -s $BASEDIR/ghostty $HOME/Library/Application\ Support/com.mitchellh.ghostty/config
+fi
+
 # setup gpg conf
 test -d $HOME/.gnupg || mkdir $HOME/.gnupg
 cp -f $BASEDIR/gnupg/common.conf $HOME/.gnupg/common.conf
