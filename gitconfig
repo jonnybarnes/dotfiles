@@ -36,7 +36,7 @@
     ff = only
 
 [core]
-    pager = delta
+    pager = delta --side-by-side --width ${FZF_PREVIEW_COLUMNS-$COLUMNS}
 
 [interactive]
     diffFilter = delta --color-only
