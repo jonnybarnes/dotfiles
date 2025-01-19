@@ -107,14 +107,9 @@ if type vivid &>/dev/null; then
   export LS_COLORS="$(vivid generate $vividTheme)"
 fi
 
-# Set colour scheme got bat
-# bat Dark mode   OneHalfDark
-# bat Light mode  gruvbox-light
-local batTheme="OneHalfDark"
-if [[ $MACOS_APPEARANCE == "light" ]]; then
-  batTheme="gruvbox-light"
-fi
-export BAT_THEME=$batTheme
+# Set colour scheme for bat
+export BAT_THEME_LIGHT="GitHub"
+export BAT_THEME_DARK="Sublime Snazzy"
 
 # Source the untracked `extra` file
 test -e $HOME/.extra && source $HOME/.extra
