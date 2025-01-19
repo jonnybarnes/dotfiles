@@ -36,7 +36,10 @@ ezacd () {
 
   eza --oneline --long --classify --icons --header
 }
-chpwd_functions=(${chpwd_functions[@]} "ezacd")
+# Only add ezacd to chpwd_functions if it's not already there
+if (( ${chpwd_functions[(I)ezacd]} == 0 )); then
+  chpwd_functions=(${chpwd_functions[@]} "ezacd")
+fi
 
 # Go Lang stuff
 export GOPATH=$HOME/go
