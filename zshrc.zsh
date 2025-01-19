@@ -36,8 +36,10 @@ ezacd () {
 
   eza --oneline --long --classify --icons --header
 }
+# Initialize chpwd_functions if it doesn't exist
+typeset -ga chpwd_functions
 # Only add ezacd to chpwd_functions if it's not already there
-if (( ${chpwd_functions[(I)ezacd]} == 0 )); then
+if [[ ${chpwd_functions[(ie)ezacd]} -gt ${#chpwd_functions} ]]; then
   chpwd_functions=(${chpwd_functions[@]} "ezacd")
 fi
 
