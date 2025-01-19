@@ -6,7 +6,8 @@ font-family = MonaspiceKr NFM
 font-thicken = true
 
 # Set the theme
-theme = Cobalt2
+#theme = Cobalt2
+theme = light:flexoki-light,dark:flexiko-dark
 
 # Fix an issue when switching apps on macOS Ventura’s Stage Manager
 background-opacity = 0.999
