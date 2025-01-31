@@ -8,7 +8,8 @@ font-thicken = true
 # Set the theme
 #theme = Cobalt2
 #theme = light:flexoki-light,dark:flexiko-dark
-theme = light:catppuccin-latte,dark:catppuccin-macchiato
+#theme = light:catppuccin-latte,dark:catppuccin-macchiato
+theme = light:Novel,dark:catppuccin-macchiato
 
 # Fix an issue when switching apps on macOS Ventura’s Stage Manager
 background-opacity = 0.999
