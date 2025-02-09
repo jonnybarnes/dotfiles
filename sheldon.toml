@@ -31,9 +31,6 @@ github = "zsh-users/zsh-completions"
 [plugins.zsh-defer]
 github = "romkatv/zsh-defer"
 
-[plugins.iterm2-shell-integration]
-remote = "https://iterm2.com/shell_integration/zsh"
-
 # Some of the functions may get used elsewhere
 # so we do not defer loading
 [plugins.functions]
@@ -82,11 +79,11 @@ local = "~/.zsh/plugins"
 apply = ["defer"]
 
 [plugins.zoxide]
-local = "~/.zsh/plugins"
+github = "ajeetdsouza/zoxide"
 apply = ["defer"]
 
 [plugins.mcfly]
-local = "~/.zsh/plugins"
+github = "cantino/mcfly"
 apply = ["defer"]
 
 # This works best if it is placed last.
