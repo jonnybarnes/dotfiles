@@ -53,7 +53,9 @@
 
 [diff]
     algorithm = histogram
-    colorMoved = default
+    colorMoved = plain
+    mnemonicPrefix = true
+    renames = true
 
 [tar "tar.xz"]
     command = xz -c
@@ -63,3 +65,21 @@
 
 [init]
     defaultBranch = main
+
+[column]
+    ui = auto
+
+[branch]
+    sort = -committerdate
+
+[tag]
+    sort = version:refname
+
+[rerere]
+    enabled = true
+    autoupdate = true
+
+[rebase]
+    autoSquash = true
+    autoStash = true
+    updateRefs = true
