@@ -3,6 +3,7 @@
 HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=10000
+setopt share_history
 
 # vim binddings
 bindkey -v
