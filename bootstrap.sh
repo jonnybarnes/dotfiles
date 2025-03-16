@@ -48,6 +48,9 @@ ln -s $BASEDIR/neovim $HOME/.config/nvim
 echo "For compatability we chall copy the global gitconfig"
 cp $BASEDIR/gitconfig $HOME/.gitconfig
 
+# Copy the progs into the local bin dir
+rsync -av --chmod=+x $BASEDIR/bin/ $HOME/.local/bin/
+
 # Source zshrc
 echo "And finally, source the .zshrc"
 source $HOME/.zshrc

@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+
+# Copy .torrent files to my server
+
+local torrentFile="$1"
+
+if [[ ! (-e $torrentFile) ]]
+then
+    echo "The specified file does not exist"
+    exit 1
+fi
+
+if [[ ! ($torrentFile =~ (torrent$)) ]]
+then
+    echo "File specified must be a torrent file"
+    exit 1
+fi
+
+# rsync the file over
+rsync --remove-source-files --compress --compress-choice=zstd --compress-level=22 $torrentFile jmbhetz:~/.torrents/
+
