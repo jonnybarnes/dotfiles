@@ -1,5 +1,9 @@
 # Ghostty config
 
+# Set the shell to zsh
+# This will be searched in the PATH so should find our custom install
+command = zsh
+
 # Font configuration
 font-size = 18
 font-family = MonaspiceKr NFM
@@ -18,7 +22,7 @@ background-opacity = 0.999
 minimum-contrast = 1.1
 
 # I got used to this behaviour on iTerm
-copy-on-select = true
+copy-on-select = clipboard
 
 # Open new tabs in the home directory
 window-inherit-working-directory = false
