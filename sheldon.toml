@@ -86,6 +86,9 @@ apply = ["defer"]
 github = "cantino/mcfly"
 apply = ["defer"]
 
+[plugins.zsh-ssh]
+github = 'sunlei/zsh-ssh'
+
 # This works best if it is placed last.
 [plugins.compinit]
 local = "~/.zsh/plugins"
