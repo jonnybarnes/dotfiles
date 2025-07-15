@@ -120,6 +120,10 @@ export BAT_THEME_DARK="Sublime Snazzy"
 # Source the untracked `extra` file
 test -e $HOME/.extra && source $HOME/.extra
 
+# Auto quote pasted URLs
+autoload -U url-quote-magic
+zle -N self-insert url-quote-magic
+
 # Set the prompt
 # We need zsh git integration
 # Autoload zsh's `add-zsh-hook` and `vcs_info` functions
