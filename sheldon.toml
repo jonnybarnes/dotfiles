@@ -52,10 +52,6 @@ apply = ["defer"]
 local = "~/.zsh/plugins"
 apply = ["defer"]
 
-[plugins.zsh-syntax-highlighting]
-github = "zsh-users/zsh-syntax-highlighting"
-apply = ["defer"]
-
 [plugins.zsh-substring-search]
 github = "zsh-users/zsh-history-substring-search"
 apply = ["defer"]
@@ -88,6 +84,10 @@ apply = ["defer"]
 
 [plugins.zsh-ssh]
 github = 'sunlei/zsh-ssh'
+
+[plugins.zsh-syntax-highlighting]
+github = "zsh-users/zsh-syntax-highlighting"
+apply = ["defer"]
 
 # This works best if it is placed last.
 [plugins.compinit]
