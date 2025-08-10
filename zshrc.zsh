@@ -14,7 +14,7 @@ export LANG=en_GB.UTF-8
 # Preferred editor for local and remote sessions
 export EDITOR=nvim
 
-# Autoadd to PATH (neede for MacTex)
+# Auto-add to PATH (needed for MacTex)
 # It prepends to $PATH, so we do it first then add our own
 if [[ -f /usr/libexec/path_helper ]]; then
   eval $(/usr/libexec/path_helper)
@@ -31,7 +31,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # credit Paul Irish: https://github.com/paulirish/dotfiles/blob/606d85f083eb53853789ce9dcaf31a49756471bd/.zshrc#L80
 # Automatically list directory contents on `cd`.
-# Switched to using `exa` instead of `ls`.
+# Switched to using `eza` instead of `ls`.
 ezacd () {
   emulate -L zsh;
 
@@ -93,12 +93,25 @@ if (( ${+commands[brew]} )); then
 fi
 
 
-# Load plugins via Sheldon
-if (( ${+commands[sheldon]} )); then
-  eval "$(sheldon source)"
-fi
 
 # Detect system appearance
+function get-system-appearance() {
+  if ! type defaults &>/dev/null; then
+    echo ""
+  fi
+
+  local darkMode=true;
+
+  if [[ $(defaults read -g AppleInterfaceStyle 2> /dev/null) != 'Dark' ]]; then
+    darkMode=false
+  fi
+
+  if [[ $darkMode == true ]]; then
+    echo "dark"
+  else
+    echo "light"
+  fi
+}
 export MACOS_APPEARANCE=`get-system-appearance`
 
 # Colourised output for `ls`
@@ -123,6 +136,11 @@ test -e $HOME/.extra && source $HOME/.extra
 # Auto quote pasted URLs
 autoload -U url-quote-magic
 zle -N self-insert url-quote-magic
+
+# Load plugins via Sheldon
+if (( ${+commands[sheldon]} )); then
+  eval "$(sheldon source)"
+fi
 
 # Set the prompt
 # We need zsh git integration

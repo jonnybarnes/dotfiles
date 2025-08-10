@@ -7,8 +7,16 @@
 shell = "zsh"
 
 [templates]
-defer = """{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source "{{ file }}"\n{% endfor %}{{ hooks?.post | nl }}"""
-defer-more = """{{ hooks?.pre | nl }}{% for file in files %}zsh-defer -t 0.5 source "{{ file }}"\n{% endfor %}{{ hooks?.post | nl }}"""
+defer = '''
+    {{- hooks?.pre | nl }}
+    {%- for file in files %}zsh-defer source "{{ file }}"{{ "\n" }}
+    {%- endfor %}
+    {{- hooks?.post | nl }}'''
+defer-more = '''
+    {{- hooks?.pre | nl }}
+    {%- for file in files %}zsh-defer -t 0.5 source "{{ file }}"{{ "\n" }}
+    {%- endfor %}
+    {{- hooks?.post | nl }}'''
 
 # Loading indicator
 # -----------------
@@ -19,22 +27,17 @@ local = "~/.zsh/plugins/loading"
 # Completions
 # -----------
 
-[plugins.fzf-tab]
-github = "Aloxaf/fzf-tab"
-
 [plugins.zsh-completions]
 github = "zsh-users/zsh-completions"
 
 # Sourced
 # -------
 
-[plugins.zsh-defer]
-github = "romkatv/zsh-defer"
-
-# Some of the functions may get used elsewhere
-# so we do not defer loading
 [plugins.functions]
 local = "~/.zsh/plugins"
+
+[plugins.zsh-defer]
+github = "romkatv/zsh-defer"
 
 # Deferred plugins
 # ----------------
@@ -46,6 +49,10 @@ apply = ["defer"]
 [plugins.fzf]
 github = "junegunn/fzf"
 use = ["shell/completion.zsh", "shell/key-bindings.zsh"]
+apply = ["defer"]
+
+[plugins.fzf-tab]
+github = "Aloxaf/fzf-tab"
 apply = ["defer"]
 
 [plugins.fzf-completions]
@@ -71,8 +78,9 @@ github = "wfxr/forgit"
 apply = ["defer"]
 
 [plugins.fnm]
-local = "~/.zsh/plugins"
+github = "dominik-schwabe/zsh-fnm"
 apply = ["defer"]
+hooks.pre = 'export ZSH_FNM_ENV_EXTRA_ARGS="--use-on-cd"'
 
 [plugins.zoxide]
 github = "ajeetdsouza/zoxide"
@@ -84,6 +92,7 @@ apply = ["defer"]
 
 [plugins.zsh-ssh]
 github = 'sunlei/zsh-ssh'
+apply = ["defer"]
 
 [plugins.zsh-syntax-highlighting]
 github = "zsh-users/zsh-syntax-highlighting"

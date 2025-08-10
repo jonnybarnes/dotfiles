@@ -100,21 +100,3 @@ function stop-proxy() {
   ssh -S $socket_dir/ssh-proxy-control -O exit $SSH_PROXY_HOST
 }
 
-# Get the system appearance
-function get-system-appearance() {
-  if ! type defaults &>/dev/null; then
-    echo ""
-  fi
-  
-  local darkMode=true;
-
-  if [[ $(defaults read -g AppleInterfaceStyle 2> /dev/null) != 'Dark' ]]; then
-    darkMode=false
-  fi
-
-  if [[ $darkMode == true ]]; then
-    echo "dark"
-  else
-    echo "light"
-  fi
-}
