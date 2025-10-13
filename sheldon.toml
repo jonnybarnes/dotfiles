@@ -80,7 +80,7 @@ apply = ["defer"]
 [plugins.fnm]
 github = "dominik-schwabe/zsh-fnm"
 apply = ["defer"]
-hooks.pre = 'export ZSH_FNM_ENV_EXTRA_ARGS="--use-on-cd"'
+hooks.pre = 'export ZSH_FNM_ENV_EXTRA_ARGS="--use-on-cd --version-file-strategy recursive --resolve-engines false"'
 
 [plugins.zoxide]
 github = "ajeetdsouza/zoxide"
