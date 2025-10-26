@@ -12,8 +12,6 @@ echo "Sym-linking the various config files"
 test -L $HOME/.gitignore || ln -f -s $BASEDIR/gitignore $HOME/.gitignore
 test -L $HOME/.hushlogin || ln -f -s $BASEDIR/hushlogin $HOME/.hushlogin
 test -L $HOME/.tmux.conf || ln -f -s $BASEDIR/tmux $HOME/.tmux.conf
-test -L $HOME/.config/starship.toml || ln -f -s $BASEDIR/starship.toml $HOME/.config/starship.toml
-test -L $HOME/.config/jmb.omp.toml || ln -f -s $BASEDIR/jmb.omp.toml $HOME/.config/jmb.omp.toml
 test -d $HOME/.config/sheldon || mkdir $HOME/.config/sheldon
 test -L $HOME/.config/sheldon/plugins.toml || ln -f -s $BASEDIR/sheldon.toml $HOME/.config/sheldon/plugins.toml
 test -L $HOME/.zsh || ln -f -s $BASEDIR/zsh $HOME/.zsh
@@ -21,7 +19,11 @@ test -L $HOME/.zshrc || ln -f -s $BASEDIR/zshrc.zsh $HOME/.zshrc
 
 # If ghostty is installed on the system then setup the config
 if (( ${+commands[ghostty]} )); then
-  test -L $HOME/Library/Application\ Support/com.mitchellh.ghostty/config || ln -f -s $BASEDIR/ghostty $HOME/Library/Application\ Support/com.mitchellh.ghostty/config
+  test -d $HOME/.config/ghostty || mkdir $HOME/.config/ghostty
+  test -L $HOME/.config/ghostty/config || ln -f -s $BASEDIR/ghostty/config $HOME/.config/ghostty/config
+  test -d $HOME/.config/ghostty/themes || mkdir $HOME/.config/ghostty/themes
+  test -L $HOME/.config/ghostty/themes/tangere-dark.conf || ln -f -s $BASEDIR/ghostty/themes/tangere-dark $HOME/.config/ghostty/themes/tangere-dark.conf
+  test -L $HOME/.config/ghostty/themes/tangere-light.conf || ln -f -s $BASEDIR/ghostty/themes/tangere-light $HOME/.config/ghostty/themes/tangere-light.conf
 fi
 
 # setup gpg conf
