@@ -92,6 +92,8 @@ if (( ${+commands[brew]} )); then
   test -d $(brew --prefix)/opt/curl && export PATH="$(brew --prefix)/opt/curl/bin:$PATH"
 fi
 
+# Rainfrog config
+export RAINFROG_CONFIG=~/.config/rainfrog
 
 
 # Detect system appearance
