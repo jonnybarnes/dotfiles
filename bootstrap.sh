@@ -36,15 +36,18 @@ chmod 640 $HOME/.gnupg/common.conf
 chmod 640 $HOME/.gnupg/dirmngr.conf
 chmod 640 $HOME/.gnupg/gpg.conf
 
-# ln vim files
-echo "Setting up vim"
-test -d $HOME/.vim && rm -rf $HOME/.vim
-ln -s $BASEDIR/vim $HOME/.vim
-test -L $HOME/.vimrc || ln -f -s $HOME/.vim/vimrc $HOME/.vimrc
-
 echo "Setting up NeoVim"
 test -d $HOME/.config/nvim && rm -rf $HOME/.config/nvim
 ln -s $BASEDIR/neovim $HOME/.config/nvim
+
+# Clean up old vim configuration if it exists
+if [ -L "$HOME/.vimrc" ] || [ -f "$HOME/.vimrc" ]; then
+    echo "Removing old vim configuration"
+    rm -f $HOME/.vimrc
+fi
+if [ -L "$HOME/.vim" ] || [ -d "$HOME/.vim" ]; then
+    rm -rf $HOME/.vim
+fi
 
 # .gitconfig gets edited by .extra so we won’t symlink it, but copy it
 echo "For compatability we chall copy the global gitconfig"
