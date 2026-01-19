@@ -27,7 +27,8 @@ window-inherit-working-directory = false
 
 # Make alt+{key} keyboard shortcuts work
 # https://github.com/ghostty-org/ghostty/discussions/3483#discussioncomment-11716750
-macos-option-as-alt = left
+# Need to work out if I am using `rainfrog` which was the impetus for this change
+#macos-option-as-alt = left
 
 keybind = alt+left=unbind
 keybind = alt+right=unbind
