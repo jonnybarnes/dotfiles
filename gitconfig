@@ -41,12 +41,16 @@
 [interactive]
     diffFilter = delta --color-only
 
+[include]
+    path = ~/.config/delta/themes.gitconfig
+
 [delta]
     # use n and N to move between diff sections
     navigate = true
     side-by-side = true
     hyperlinks = true
     hyperlinks-file-link-format = "idea://open?file={path}&line={line}"
+    #features = weeping-willow
 
 [merge]
     conflictstyle = zdiff3

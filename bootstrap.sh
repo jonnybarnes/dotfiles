@@ -16,6 +16,8 @@ test -d $HOME/.config/sheldon || mkdir $HOME/.config/sheldon
 test -L $HOME/.config/sheldon/plugins.toml || ln -f -s $BASEDIR/sheldon.toml $HOME/.config/sheldon/plugins.toml
 test -L $HOME/.zsh || ln -f -s $BASEDIR/zsh $HOME/.zsh
 test -L $HOME/.zshrc || ln -f -s $BASEDIR/zshrc.zsh $HOME/.zshrc
+test -d $HOME/.config/delta || mkdir $HOME/.config/delta
+test -L $HOME/.config/delta/themes.gitconfig || ln -f -s $BASEDIR/delta-themes.gitconfig $HOME/.config/delta/themes.gitconfig
 
 # If ghostty is installed on the system then setup the config
 if (( ${+commands[ghostty]} )); then
