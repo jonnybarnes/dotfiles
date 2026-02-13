@@ -2,20 +2,19 @@
 My NeoVim configuration
 --]]
 
--- disable netrw at the very start of your init.lua
+-- Plugins
+-- nvim-tree recommends disabling netrw (vim’s file explorer)
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
+--require("nvim-tree").setup()
 
--- Plugins
-require('nvim-web-devicons').setup()
--- require('oil').setup()
-require('nvim-tree').setup()
-require('gitsigns').setup()
-require('lspconfig').phpactor.setup({})
+--require('gitsigns').setup()
 
 -- Editor options
-vim.wo.number = true
+-- show line numbers
+vim.opt.number = true
 
+-- set spelling to British English
 vim.opt.spelllang = 'en_gb'
 vim.opt.spell = true
 

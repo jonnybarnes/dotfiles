@@ -3,10 +3,6 @@
 # Current dir
 BASEDIR=$(pwd)
 
-# Update git submodules
-echo "Updating git submodules"
-git submodule init && git submodule update
-
 # ln the various files
 echo "Sym-linking the various config files"
 test -L $HOME/.gitignore || ln -f -s $BASEDIR/gitignore $HOME/.gitignore
@@ -42,17 +38,8 @@ echo "Setting up NeoVim"
 test -d $HOME/.config/nvim && rm -rf $HOME/.config/nvim
 ln -s $BASEDIR/neovim $HOME/.config/nvim
 
-# Clean up old vim configuration if it exists
-if [ -L "$HOME/.vimrc" ] || [ -f "$HOME/.vimrc" ]; then
-    echo "Removing old vim configuration"
-    rm -f $HOME/.vimrc
-fi
-if [ -L "$HOME/.vim" ] || [ -d "$HOME/.vim" ]; then
-    rm -rf $HOME/.vim
-fi
-
-# .gitconfig gets edited by .extra so we won’t symlink it, but copy it
-echo "For compatability we chall copy the global gitconfig"
+# .gitconfig gets edited by .extra so we won't symlink it, but copy it
+echo "For compatibility we shall copy the global gitconfig"
 cp $BASEDIR/gitconfig $HOME/.gitconfig
 
 # Copy the progs into the local bin dir
