@@ -13,9 +13,6 @@ font-thicken = true
 #theme = light:Catppuccin Latte,dark:Catppuccin Macchiato
 theme = light:tangere-light.conf,dark:tangere-dark.conf
 
-# Fix an issue when switching apps on macOS Ventura’s Stage Manager
-background-opacity = 0.999
-
 # Try to ensure readability of text
 minimum-contrast = 1.1
 
@@ -28,7 +25,7 @@ window-inherit-working-directory = false
 # Make alt+{key} keyboard shortcuts work
 # https://github.com/ghostty-org/ghostty/discussions/3483#discussioncomment-11716750
 # Need to work out if I am using `rainfrog` which was the impetus for this change
-#macos-option-as-alt = left
+macos-option-as-alt = right
 
-keybind = alt+left=unbind
-keybind = alt+right=unbind
+#keybind = alt+left=unbind
+#keybind = alt+right=unbind
