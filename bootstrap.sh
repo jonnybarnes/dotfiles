@@ -35,8 +35,9 @@ chmod 640 $HOME/.gnupg/dirmngr.conf
 chmod 640 $HOME/.gnupg/gpg.conf
 
 echo "Setting up NeoVim"
-test -d $HOME/.config/nvim && rm -rf $HOME/.config/nvim
-ln -s $BASEDIR/neovim $HOME/.config/nvim
+test -d $HOME/.config/nvim || mkdir -p $HOME/.config/nvim
+test -d $HOME/.local/share/nvim || mkdir -p $HOME/.local/share/nvim
+test -L $HOME/.config/nvim/init.lua || ln -f -s $BASEDIR/neovim/init.lua $HOME/.config/nvim/init.lua
 
 # .gitconfig gets edited by .extra so we won't symlink it, but copy it
 echo "For compatibility we shall copy the global gitconfig"
