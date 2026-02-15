@@ -21,3 +21,6 @@ vim.opt.spell = true
 
 -- 24-bit colour support
 vim.opt.termguicolors = true
+
+-- LSP/PHP setup
+vim.lsp.enable('phpactor')

@@ -68,6 +68,9 @@ export GRAVEYARD="$HOME/.local/share/Trash"
 # composer global
 export PATH="$PATH:$HOME/.composer/vendor/bin"
 
+# phpactor installed manually
+export PATH="$PATH:$HOME/git/phpactor/bin"
+
 # rust/cargo bin PATH
 export PATH="$PATH:$HOME/.cargo/bin"
 

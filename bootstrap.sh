@@ -38,6 +38,8 @@ echo "Setting up NeoVim"
 test -d $HOME/.config/nvim || mkdir -p $HOME/.config/nvim
 test -d $HOME/.local/share/nvim || mkdir -p $HOME/.local/share/nvim
 test -L $HOME/.config/nvim/init.lua || ln -f -s $BASEDIR/neovim/init.lua $HOME/.config/nvim/init.lua
+test -d $HOME/.config/nvim/lsp || mkdir -p $HOME/.config/nvim/lsp
+test -L $HOME/.config/nvim/lsp/phpactor.lua || ln -f -s $BASEDIR/neovim/lsp/phpactor.lua $HOME/.config/nvim/lsp/phpactor.lua
 
 # .gitconfig gets edited by .extra so we won't symlink it, but copy it
 echo "For compatibility we shall copy the global gitconfig"
