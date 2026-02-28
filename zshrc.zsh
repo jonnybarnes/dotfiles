@@ -59,6 +59,9 @@ if (( ${+commands[brew]} )); then
   export PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH"
 fi
 
+# Add Obsidian CLI
+export PATH="$PATH:/Applications/Obsidian.app/Contents/MacOS"
+
 # Add Totara Docker helper functions
 export PATH="$PATH:$HOME/git/totara-docker-dev/bin"
 
