@@ -1,5 +1,8 @@
 #!/usr/bin/env zsh
 
+# Add custom docker completion to fpath
+FPATH="$HOME/.docker/completions:$FPATH"
+
 # Load all stock functions (from $fpath files) called below.
 autoload -U compaudit compinit
 

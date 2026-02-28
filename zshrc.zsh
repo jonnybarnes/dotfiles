@@ -95,6 +95,9 @@ if (( ${+commands[brew]} )); then
   test -d $(brew --prefix)/opt/curl && export PATH="$(brew --prefix)/opt/curl/bin:$PATH"
 fi
 
+# Local Docker if set up that way
+test -d $HOME/.docker/bin && export PATH="$HOME/.docker/bin:$PATH"
+
 # Rainfrog config
 export RAINFROG_CONFIG=~/.config/rainfrog
 
