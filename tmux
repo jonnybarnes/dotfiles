@@ -21,6 +21,9 @@ set -g mouse on
 # don't rename windows automatically
 set-option -g allow-rename off
 
+# Allow OSC 8 links
+set -ga terminal-features "*:hyperlinks"
+
 # Get 256 colour support
 set -g default-terminal "screen-256color"
 # tell Tmux that outside terminal supports true color
