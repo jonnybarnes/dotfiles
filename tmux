@@ -1,6 +1,6 @@
-# remap prefix from 'C-b' to 'C-a'
-unbind C-b
+# add C-a as primary prefix, keep C-b as secondary
 set-option -g prefix C-a
+set-option -g prefix2 C-b
 bind-key C-a send-prefix
 
 # start with window 1 (instead of 0)
@@ -11,6 +11,9 @@ setw -g pane-base-index 1
 # renumber windows sequentially after closing any of them
 set -g renumber-windows on
 
+# don't detach when closing a window if other windows remain
+set -g detach-on-destroy off
+
 # reload config file (change file location to your the tmux.conf you want to use)
 unbind r
 bind r source-file ~/.tmux.conf
@@ -18,16 +21,17 @@ bind r source-file ~/.tmux.conf
 # Enable mouse mode (tmux 2.1 and above)
 set -g mouse on
 
+# Track focus events
+#set-option -g focus-events on
+
 # don't rename windows automatically
 set-option -g allow-rename off
 
+# Set terminal
+set -g default-terminal "$TERM"
+
 # Allow OSC 8 links
 set -ga terminal-features "*:hyperlinks"
-
-# Get 256 colour support
-set -g default-terminal "screen-256color"
-# tell Tmux that outside terminal supports true color
-set -as terminal-features ",xterm-256color:RGB"
 
 # Tweak status bar styles
 set -g status-style bg=default,fg='#fdfdd9'
