@@ -41,6 +41,10 @@ test -L $HOME/.config/nvim/init.lua || ln -f -s $BASEDIR/neovim/init.lua $HOME/.
 test -d $HOME/.config/nvim/lsp || mkdir -p $HOME/.config/nvim/lsp
 test -L $HOME/.config/nvim/lsp/phpactor.lua || ln -f -s $BASEDIR/neovim/lsp/phpactor.lua $HOME/.config/nvim/lsp/phpactor.lua
 
+# Claude Code statusline
+test -d $HOME/.claude || mkdir $HOME/.claude
+test -L $HOME/.claude/statusline.sh || ln -f -s $BASEDIR/claude/statusline.sh $HOME/.claude/statusline.sh
+
 # .gitconfig gets edited by .extra so we won't symlink it, but copy it
 echo "For compatibility we shall copy the global gitconfig"
 cp $BASEDIR/gitconfig $HOME/.gitconfig
