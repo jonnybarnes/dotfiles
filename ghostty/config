@@ -6,7 +6,7 @@ command = zsh
 
 # Font configuration
 font-size = 18
-ont-family = Hack Nerd Font Mono
+font-family = Hack Nerd Font Mono
 font-thicken = true
 
 # Set the theme
