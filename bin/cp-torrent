@@ -17,5 +17,5 @@ then
 fi
 
 # rsync the file over
-rsync --remove-source-files --compress --compress-choice=zstd --compress-level=22 $torrentFile jmbhetz:~/.torrents/
+rsync --remove-source-files --compress --compress-choice=zstd --compress-level=22 $torrentFile minas-tirith:~/rtorrent/watch/start/
 
