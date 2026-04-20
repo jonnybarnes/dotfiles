@@ -24,18 +24,14 @@ brew install vim
 brew install curl
 brew install grep
 brew install openssh
-
-# Install zsh and addons
+brew install rsync
 brew install zsh
-brew install zsh-autosuggestions
-brew install zsh-completions
-brew install zsh-history-substring-search
-brew install zsh-syntax-highlighting
 
 # Install other useful utilities
 brew install ack
 brew install age
 brew install awscli
+brew install b3sum
 brew install bat
 brew install oven-sh/bun/bun
 brew install diff-so-fancy
@@ -46,28 +42,36 @@ brew install fnm
 brew install fzf
 brew install gh
 brew install git
+brew install git-delta
 brew install git-lfs
 brew install gnupg
 brew install hexyl
-brew install imagemagick
 brew install lazygit
 brew install mcfly
 brew install neovim
-brew install oh-my-posh
 brew install p7zip
 brew install pcre
 brew install ripgrep
 brew install rm-improved
 brew install ruby
 brew install sheldon
-brew install starship
 brew install sqlite
 brew install thefuck
+brew install tmux
+brew install uv
 brew install vivid
 brew install wget
 brew install xz
 brew install zopfli
 brew install zoxide
+
+# Install some casks
+brew install --cask 1password-cli
+brew install --cask airbuddy
+brew install --cask claude-code
+brew install --cask ngrok
+brew install --cask silentknight
+brew install --cask sublime-text
 
 # Remove outdated versions from the Cellar
 brew cleanup
