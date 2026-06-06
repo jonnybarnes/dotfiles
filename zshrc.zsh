@@ -47,16 +47,16 @@ fi
 # Go Lang stuff
 export GOPATH=$HOME/go
 if (( ${+commands[brew]} )); then
-  export PATH="$PATH:$(brew --prefix)/go/bin:$(brew --prefix)/opt/go/libexec/bin:$GOPATH/bin"
+  export PATH="$PATH:$HOMEBREW_PREFIX/go/bin:$HOMEBREW_PREFIX/opt/go/libexec/bin:$GOPATH/bin"
 fi
 
 # Add various GNU functions
 # Prepend them to the PATH so they override any system installed versions
 if (( ${+commands[brew]} )); then
-  export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH"
-  export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH"
-  export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
-  export PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH"
+  export PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
+  export PATH="$HOMEBREW_PREFIX/opt/findutils/libexec/gnubin:$PATH"
+  export PATH="$HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin:$PATH"
+  export PATH="$HOMEBREW_PREFIX/opt/grep/libexec/gnubin:$PATH"
 fi
 
 # Add Obsidian CLI
@@ -79,12 +79,12 @@ export PATH="$PATH:$HOME/.cargo/bin"
 
 # Ruby PATH
 if (( ${+commands[brew]} )); then
-  export PATH="$PATH:$(brew --prefix)/opt/ruby/bin"
+  export PATH="$PATH:$HOMEBREW_PREFIX/opt/ruby/bin"
 fi
 
 # PostgreSQL binaries
 if (( ${+commands[brew]} )); then
-  test -d $(brew --prefix)/pgsql && export PATH="$PATH:$(brew --prefix)/pgsql/bin"
+  test -d $HOMEBREW_PREFIX/pgsql && export PATH="$PATH:$HOMEBREW_PREFIX/pgsql/bin"
 fi
 
 # PHP binaries
@@ -95,7 +95,7 @@ test -d "$HOME/Library/Application Support/JetBrains/Toolbox/scripts" && export 
 
 # Homebrew cURL if we have it
 if (( ${+commands[brew]} )); then
-  test -d $(brew --prefix)/opt/curl && export PATH="$(brew --prefix)/opt/curl/bin:$PATH"
+  test -d $HOMEBREW_PREFIX/opt/curl && export PATH="$HOMEBREW_PREFIX/opt/curl/bin:$PATH"
 fi
 
 # Local Docker if set up that way
