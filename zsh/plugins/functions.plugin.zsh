@@ -2,6 +2,17 @@
 
 # Functions
 
+# Run claude, naming the tmux window after it.
+# The native installer's binary is named after its version (e.g. "2.1.170"),
+# so tmux's automatic-rename picks that up instead of "claude".
+function claude() {
+  if [ -n "$TMUX" ]; then
+    tmux rename-window claude
+  fi
+
+  command claude "$@"
+}
+
 # Delete branches selected via fzf
 function delete-branches() {
   git branch |
