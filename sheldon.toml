@@ -51,16 +51,15 @@ github = "junegunn/fzf"
 use = ["shell/completion.zsh", "shell/key-bindings.zsh"]
 apply = ["defer"]
 
-[plugins.fzf-tab]
-github = "Aloxaf/fzf-tab"
-apply = ["defer"]
-
-[plugins.fzf-completions]
+# compinit must run before fzf-tab and before any plugin that calls `compdef`
+# (fnm, zoxide). ZLE-wrapping plugins (autosuggestions, syntax-highlighting)
+# must be sourced after fzf-tab.
+[plugins.compinit]
 local = "~/.zsh/plugins"
 apply = ["defer"]
 
-[plugins.zsh-substring-search]
-github = "zsh-users/zsh-history-substring-search"
+[plugins.fzf-tab]
+github = "Aloxaf/fzf-tab"
 apply = ["defer"]
 
 [plugins.zsh-autosuggestions]
@@ -96,11 +95,6 @@ apply = ["defer"]
 
 [plugins.zsh-syntax-highlighting]
 github = "zsh-users/zsh-syntax-highlighting"
-apply = ["defer"]
-
-# This works best if it is placed last.
-[plugins.compinit]
-local = "~/.zsh/plugins"
 apply = ["defer"]
 
 # Loading indicator
