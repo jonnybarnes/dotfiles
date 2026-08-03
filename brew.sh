@@ -46,6 +46,7 @@ brew install git-delta
 brew install git-lfs
 brew install gnupg
 brew install hexyl
+brew install jq
 brew install lazygit
 brew install mcfly
 brew install neovim
