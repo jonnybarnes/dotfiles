@@ -89,12 +89,15 @@ fn=$(( fn + 1 )); printf '%s' "$fn" > "$FRAMEF" 2>/dev/null
 # ---- per-model hue family + per-effort color --------------------------------
 # Each model gets its own rainbow: Opus = warm reds/golds, Sonnet = blues,
 # Fable = purples/magentas, Haiku = greens, unknown = full rainbow.
+# Keep every hue above ghostty's minimum-contrast (1.1) against the LIGHT
+# theme bg (#fdfdfa) — below it ghostty swaps the fg for black. That ruled out
+# 226 (#ffff00, ratio 1.05), which rendered as a black letter; 184 replaces it.
 case "$(printf '%s' "$model" | tr '[:upper:]' '[:lower:]')" in
-  *opus*)   MHUES=(196 202 208 214 220 226 214 208); memoji="🎭" ;;  # theater: the grand opus
+  *opus*)   MHUES=(196 202 208 214 220 184 214 208); memoji="🎭" ;;  # theater: the grand opus
   *sonnet*) MHUES=(21 27 33 39 45 51 45 39);         memoji="🪶" ;;  # quill: the poem
   *fable*)  MHUES=(93 99 135 141 177 201 171 135);   memoji="🦄" ;;  # unicorn: purple like its rainbow
   *haiku*)  MHUES=(22 28 34 40 46 82 118 46);        memoji="🌸" ;;  # cherry blossom
-  *)        MHUES=(196 208 226 46 51 33 201 129);    memoji="🤖" ;;
+  *)        MHUES=(196 208 184 46 51 33 201 129);    memoji="🤖" ;;
 esac
 case "$eff" in  # effort tier gets its own color, cool -> hot
   low)       effc=$'\e[38;5;245m' ;;  # grey
