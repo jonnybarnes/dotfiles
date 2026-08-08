@@ -7,6 +7,7 @@ wk.setup()
 -- Names for the <leader> prefixes, so the popup groups them sensibly
 wk.add({
   { '<leader>d', group = 'diagnostics' },
+  { '<leader>f', group = 'find' },
   { '<leader>h', group = 'hunks' },
   { '<leader>t', group = 'toggles' },
 })
