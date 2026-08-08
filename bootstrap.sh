@@ -38,6 +38,7 @@ echo "Setting up NeoVim"
 test -d $HOME/.config/nvim || mkdir -p $HOME/.config/nvim
 test -d $HOME/.local/share/nvim || mkdir -p $HOME/.local/share/nvim
 test -L $HOME/.config/nvim/init.lua || ln -f -s $BASEDIR/neovim/init.lua $HOME/.config/nvim/init.lua
+test -L $HOME/.config/nvim/nvim-pack-lock.json || ln -f -s $BASEDIR/neovim/nvim-pack-lock.json $HOME/.config/nvim/nvim-pack-lock.json
 test -d $HOME/.config/nvim/lua || mkdir -p $HOME/.config/nvim/lua
 test -L $HOME/.config/nvim/lua/config || ln -f -s $BASEDIR/neovim/config $HOME/.config/nvim/lua/config
 test -d $HOME/.config/nvim/lsp || mkdir -p $HOME/.config/nvim/lsp
