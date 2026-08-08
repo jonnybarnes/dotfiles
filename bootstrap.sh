@@ -45,7 +45,7 @@ test -L $HOME/.config/nvim/lsp/phpactor.lua || ln -f -s $BASEDIR/neovim/lsp/phpa
 
 # Claude Code statusline
 test -d $HOME/.claude || mkdir $HOME/.claude
-ln -f -s $BASEDIR/claude/statusline.burnrate.sh $HOME/.claude/statusline.sh
+ln -f -s $BASEDIR/claude/statusline.isaacaudet.sh $HOME/.claude/statusline.sh
 
 # .gitconfig gets edited by .extra so we won't symlink it, but copy it
 echo "For compatibility we shall copy the global gitconfig"
