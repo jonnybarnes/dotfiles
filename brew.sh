@@ -16,8 +16,8 @@ brew install coreutils
 
 # Install more system utilities
 brew install moreutils findutils
-# Install GNU `sed`
-brew install gnu-sed --with-default-names
+# Install GNU `sed` (as `gsed` - we deliberately don't shadow BSD sed, see zshrc.zsh)
+brew install gnu-sed
 
 # Install more recent versions of some macOS tools.
 brew install vim
@@ -33,7 +33,7 @@ brew install age
 brew install awscli
 brew install b3sum
 brew install bat
-brew install oven-sh/bun/bun
+brew install bun
 brew install diff-so-fancy
 brew install eza
 brew install fd
