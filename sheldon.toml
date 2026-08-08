@@ -79,7 +79,14 @@ apply = ["defer"]
 [plugins.fnm]
 github = "dominik-schwabe/zsh-fnm"
 apply = ["defer"]
-hooks.pre = 'export ZSH_FNM_ENV_EXTRA_ARGS="--use-on-cd --version-file-strategy recursive --resolve-engines false"'
+# Linux boxes (e.g. the server) intentionally use the distro nodejs package
+# instead of fnm, so only load this plugin on macOS. Otherwise the plugin's
+# own fallback silently curl-installs fnm and its --use-on-cd hook then
+# prompts on every cd since no version is fnm-managed there.
+hooks.pre = '''
+if [[ "$OSTYPE" == darwin* ]]; then
+export ZSH_FNM_ENV_EXTRA_ARGS="--use-on-cd --version-file-strategy recursive --resolve-engines false"'''
+hooks.post = "fi"
 
 [plugins.zoxide]
 github = "ajeetdsouza/zoxide"
