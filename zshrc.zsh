@@ -27,11 +27,11 @@ export GOPATH=$HOME/go
 
 # Homebrew-managed tools
 if (( ${+commands[brew]} )); then
-  # GNU functions - prepend so they override any system installed versions
-  export PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
-  export PATH="$HOMEBREW_PREFIX/opt/findutils/libexec/gnubin:$PATH"
-  export PATH="$HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin:$PATH"
-  export PATH="$HOMEBREW_PREFIX/opt/grep/libexec/gnubin:$PATH"
+  # GNU functions are NOT put on the PATH under their un-prefixed names.
+  # Shadowing BSD stat/date/sed/grep silently breaks scripts that expect the
+  # macOS versions (portable scripts probe with `stat -f` / `date -j` first).
+  # Homebrew still installs the g-prefixed variants in $HOMEBREW_PREFIX/bin,
+  # so use gstat / gdate / gsed / ggrep / gfind when you want GNU behaviour.
 
   # Homebrew cURL if we have it
   test -d $HOMEBREW_PREFIX/opt/curl && export PATH="$HOMEBREW_PREFIX/opt/curl/bin:$PATH"
