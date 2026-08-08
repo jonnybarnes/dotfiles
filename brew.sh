@@ -69,7 +69,11 @@ brew install zoxide
 # Install some casks
 brew install --cask 1password-cli
 brew install --cask airbuddy
-brew install --cask claude-code
+# Deliberately no claude-code cask: brew tracks stable, we want newer
+# releases, so it's installed via Claude's own installer into ~/.local/bin
+
+# Terminal font for ghostty; also supplies the glyphs nvim-web-devicons needs
+brew install --cask font-hack-nerd-font
 brew install --cask ngrok
 brew install --cask silentknight
 brew install --cask sublime-text
