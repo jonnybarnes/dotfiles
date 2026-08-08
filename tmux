@@ -22,7 +22,7 @@ bind r source-file ~/.tmux.conf
 set -g mouse on
 
 # Track focus events
-#set-option -g focus-events on
+set-option -g focus-events on
 
 # don't rename windows automatically
 set-option -g allow-rename off
