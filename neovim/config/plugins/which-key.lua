@@ -4,8 +4,9 @@ local wk = require('which-key')
 
 wk.setup()
 
--- Names for the gitsigns prefixes, so the popup groups them sensibly
+-- Names for the <leader> prefixes, so the popup groups them sensibly
 wk.add({
+  { '<leader>d', group = 'diagnostics' },
   { '<leader>h', group = 'hunks' },
   { '<leader>t', group = 'toggles' },
 })
