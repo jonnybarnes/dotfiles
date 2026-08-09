@@ -37,15 +37,22 @@ input=$(cat)
 mkdir -p /tmp/claude
 
 # ===== Colors =====
-blue='\033[38;2;97;175;239m'
-orange='\033[38;2;255;176;85m'
-amber='\033[38;2;229;192;123m'
-green='\033[38;2;80;200;120m'
-cyan='\033[38;2;86;182;194m'
-red='\033[38;2;235;87;87m'
-yellow='\033[38;2;230;200;0m'
-white='\033[38;2;220;220;220m'
-magenta='\033[38;2;198;120;221m'
+# Palette indices rather than RGB, so these resolve through the terminal's own
+# palette and follow the ghostty tangere-light/tangere-dark swap for free. No
+# appearance detection, so no cost per statusline render.
+#
+# The previous values were One Dark RGB: fine on dark (4.3-10.8:1) but 1.35-3.4:1
+# on a light background, with 'white' effectively invisible. These clear WCAG AA
+# in both modes (5.8-14.3:1 on dark, 6.3-20.6:1 on light).
+blue='\033[38;5;4m'
+orange='\033[38;5;3m'
+amber='\033[38;5;11m'
+green='\033[38;5;2m'
+cyan='\033[38;5;14m'
+red='\033[38;5;1m'
+yellow='\033[38;5;3m'
+white='\033[39m'
+magenta='\033[38;5;5m'
 dim='\033[2m'
 reset='\033[0m'
 
