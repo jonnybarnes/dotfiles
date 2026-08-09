@@ -8,6 +8,8 @@ echo "Sym-linking the various config files"
 test -L $HOME/.gitignore || ln -f -s $BASEDIR/gitignore $HOME/.gitignore
 test -L $HOME/.hushlogin || ln -f -s $BASEDIR/hushlogin $HOME/.hushlogin
 test -L $HOME/.tmux.conf || ln -f -s $BASEDIR/tmux $HOME/.tmux.conf
+test -L $HOME/.tmux-light.conf || ln -f -s $BASEDIR/tmux-light.conf $HOME/.tmux-light.conf
+test -L $HOME/.tmux-dark.conf || ln -f -s $BASEDIR/tmux-dark.conf $HOME/.tmux-dark.conf
 test -d $HOME/.config/sheldon || mkdir $HOME/.config/sheldon
 test -L $HOME/.config/sheldon/plugins.toml || ln -f -s $BASEDIR/sheldon.toml $HOME/.config/sheldon/plugins.toml
 test -L $HOME/.zsh || ln -f -s $BASEDIR/zsh $HOME/.zsh

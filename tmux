@@ -33,9 +33,6 @@ set -g default-terminal "$TERM"
 # Allow OSC 8 links
 set -ga terminal-features "*:hyperlinks"
 
-# Tweak status bar styles
-set -g status-style bg=default,fg='#fdfdd9'
-
 # Set status bar length
 set -g status-left-length 40
 set -g status-right-length 60
@@ -43,14 +40,16 @@ set -g status-right-length 60
 # Center the window list
 set -g status-justify centre
 
-# Left side: session name with blue accent
-set -g status-left "#[fg=#1a2938,bg=#8fb4cd,bold]  #S #[fg=#8fb4cd,bg=default]\ue0b0"
+# Status bar colours live in ~/.tmux-light.conf and ~/.tmux-dark.conf. tmux
+# learns the terminal's theme over OSC 2031, so this reacts to the appearance
+# change itself, whether that came from Auto at sunrise/sunset or a manual
+# toggle, since nothing here knows why it changed.
+set-hook -g client-light-theme 'source-file ~/.tmux-light.conf'
+set-hook -g client-dark-theme 'source-file ~/.tmux-dark.conf'
 
-# Right side: multi-segment with transitions
-set -g status-right "#[fg=#6dafb5,bg=default]\ue0b2#[fg=#1a2938,bg=#6dafb5] %H:%M #[fg=#bb98d9,bg=#6dafb5]\ue0b2#[fg=#1a2938,bg=#bb98d9] %d-%b "
+# Those hooks only fire on a change, so also pick the right palette whenever a
+# client attaches. Sourcing is idempotent, so the overlap is harmless.
+set-hook -g client-attached 'if -F "#{==:#{client_theme},light}" "source-file ~/.tmux-light.conf" "source-file ~/.tmux-dark.conf"'
 
-# Inactive windows (no powerline symbols)
-setw -g window-status-format "#[fg=#2f4656,bg=default] #I #W "
-
-# Active window (cyan highlight, no powerline)
-setw -g window-status-current-format "#[fg=#1a2938,bg=#6dafb5,bold] #I #W "
+# Default before any client has attached and reported a theme.
+source-file ~/.tmux-dark.conf

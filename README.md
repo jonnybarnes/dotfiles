@@ -68,12 +68,24 @@ Most of this is now handled natively and needs no configuration:
 - **bat** picks a theme per invocation from `BAT_THEME_LIGHT` / `BAT_THEME_DARK`.
 - **delta** and **nvim** detect the terminal background themselves.
 
-Still outstanding: the tmux status bar is hardcoded to dark-tuned colours, so it
-is unreadable in light mode. tmux has `client-light-theme` and
-`client-dark-theme` hooks for exactly this — not yet wired up.
+The tmux status bar needs help, because its colours are set explicitly. They live
+in `tmux-light.conf` and `tmux-dark.conf` — the same layout, with each colour
+taken from the matching tangere palette index — and `tmux` sources one of them
+from three hooks:
 
-Both machines currently run pinned Dark, so the delta and nvim behaviour above is
-documented-but-untested here. Worth re-checking when Auto goes back on.
+- `client-light-theme` / `client-dark-theme` react to a change,
+- `client-attached` picks the right one for a client that attaches mid-way, since
+  the two above only fire on a change.
+
+Because this keys off the terminal's reported theme rather than a schedule, it
+behaves identically whether the change came from Auto at sunrise/sunset or from
+toggling Light/Dark by hand — nothing in the chain knows why it changed.
+
+> [!NOTE]
+> A running nvim will not follow a live change: the docs are explicit that the
+> TUI sets `background` *on startup* if it can detect it. New instances are
+> fine; existing ones need `:set background=light` or a restart. delta is
+> per-invocation so should be fine, but that is untested here.
 
 > [!NOTE]
 > This previously used [`dark-mode-notify`](https://github.com/bouk/dark-mode-notify)
