@@ -84,8 +84,19 @@ toggling Light/Dark by hand — nothing in the chain knows why it changed.
 > [!NOTE]
 > A running nvim will not follow a live change: the docs are explicit that the
 > TUI sets `background` *on startup* if it can detect it. New instances are
-> fine; existing ones need `:set background=light` or a restart. delta is
-> per-invocation so should be fine, but that is untested here.
+> fine — verified, a fresh nvim in light mode reports `background=light` — but
+> existing ones need `:set background=light` or a restart.
+
+Verified in light mode: the status bar switches in the same second the hook
+fires, a fresh nvim detects `light`, and delta resolves its light default
+(`syntax-theme = GitHub`, against `Monokai Extended` on dark).
+
+> [!TIP]
+> When adding these hooks to an *already running* tmux server, detach and
+> reattach. tmux enables the terminal’s theme-reporting mode when a client
+> attaches, so a client that predates the hooks never gets asked to report
+> changes — `#{client_theme}` still reads correctly, because that is answered by
+> a direct query, but no hook fires until the client reattaches.
 
 > [!NOTE]
 > This previously used [`dark-mode-notify`](https://github.com/bouk/dark-mode-notify)
