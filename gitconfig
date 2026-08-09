@@ -87,3 +87,9 @@
     autoSquash = true
     autoStash = true
     updateRefs = true
+
+# Machine-local identity and signing config. Untracked, and included last so
+# it wins over anything above. Keeps `bootstrap.sh`'s copy of this file
+# non-destructive without needing to re-apply values on every shell startup.
+[include]
+    path = ~/.gitconfig.local

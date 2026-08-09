@@ -1,0 +1,23 @@
+# Machine-local git config, included from the end of ~/.gitconfig.
+#
+# This file is NOT tracked in the dotfiles repo — it is per-machine, and holds
+# the identity and signing key. bootstrap.sh copies this template into place
+# only if ~/.gitconfig.local does not already exist, so your real values are
+# never clobbered by a re-run.
+#
+# Uncomment and fill these in on a new machine. Do not skip this: git will not
+# refuse to commit. It auto-derives an identity from your username and hostname
+# (e.g. jonny@Jonnys-MacBook.local), prints a "configured automatically"
+# warning, exits 0, and does no signing at all.
+
+#[user]
+#    name = Your Name
+#    email = you@example.com
+#    signingkey = ssh-ed25519 AAAA...
+
+#[commit]
+#    gpgsign = true
+
+# Path to the signing program, if signing SSH-style via a password manager.
+#[gpg "ssh"]
+#    program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign

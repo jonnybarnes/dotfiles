@@ -48,9 +48,18 @@ test -L $HOME/.config/nvim/lsp/phpactor.lua || ln -f -s $BASEDIR/neovim/lsp/phpa
 test -d $HOME/.claude || mkdir $HOME/.claude
 ln -f -s $BASEDIR/claude/statusline.isaacaudet.sh $HOME/.claude/statusline.sh
 
-# .gitconfig gets edited by .extra so we won't symlink it, but copy it
+# Copy rather than symlink, so an ad-hoc `git config --global` writes to $HOME
+# and not into the repo.
 echo "For compatibility we shall copy the global gitconfig"
 cp $BASEDIR/gitconfig $HOME/.gitconfig
+
+# Identity and signing live in ~/.gitconfig.local, which the above includes.
+# It is per-machine and untracked, so seed it from the template. Never
+# overwrite an existing one: it holds the real signing key.
+test -e $HOME/.gitconfig.local || {
+  echo "Seeding ~/.gitconfig.local from template — fill in your identity"
+  cp $BASEDIR/gitconfig.local.template $HOME/.gitconfig.local
+}
 
 # Copy the progs into the local bin dir
 rsync -av --chmod=+x $BASEDIR/bin/ $HOME/.local/bin/
