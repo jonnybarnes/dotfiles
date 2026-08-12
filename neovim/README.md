@@ -47,6 +47,12 @@ machine gets the same set.
   not shift the text sideways.
 - **netrw is disabled** and nvim-tree takes over directory buffers, so `nvim .`
   opens the tree rather than netrw. The tree opens on the **right**.
+- **The tree shows gitignored files**, unlike nvim-tree's default — so `.env` is
+  visible, at the cost of `vendor/`, `node_modules/` and friends also showing.
+  `I` in the tree hides them again for the session.
+- **The tree follows the current buffer**, expanding folders to reveal whatever
+  you open — including files opened from fzf-lua. It does not change the tree
+  root to do so, so opening a file from outside the root won't reveal it.
 - **Diagnostic signs are letters** (`E` `W` `I` `H`) rather than icons, and do
   not update while you are in insert mode.
 
