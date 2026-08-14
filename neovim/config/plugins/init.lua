@@ -1,3 +1,4 @@
+require('config.plugins.diffview')
 require('config.plugins.fzf-lua')
 require('config.plugins.gitsigns')
 require('config.plugins.nvim-tree')

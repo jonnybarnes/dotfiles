@@ -8,6 +8,7 @@ wk.setup()
 wk.add({
   { '<leader>d', group = 'diagnostics' },
   { '<leader>f', group = 'find' },
+  { '<leader>g', group = 'diff' },
   { '<leader>h', group = 'hunks' },
   { '<leader>t', group = 'toggles' },
 })
