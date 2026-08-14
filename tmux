@@ -14,6 +14,10 @@ set -g renumber-windows on
 # don't detach when closing a window if other windows remain
 set -g detach-on-destroy off
 
+# prompt for a name and create a session in one step, instead of
+# `<prefix> :` then `new -s name`
+bind-key S command-prompt -p "New session name:" "new-session -s '%%'"
+
 # reload config file (change file location to your the tmux.conf you want to use)
 unbind r
 bind r source-file ~/.tmux.conf
@@ -51,5 +55,7 @@ set-hook -g client-dark-theme 'source-file ~/.tmux-dark.conf'
 # client attaches. Sourcing is idempotent, so the overlap is harmless.
 set-hook -g client-attached 'if -F "#{==:#{client_theme},light}" "source-file ~/.tmux-light.conf" "source-file ~/.tmux-dark.conf"'
 
-# Default before any client has attached and reported a theme.
-source-file ~/.tmux-dark.conf
+# Default before any client has attached and reported a theme. This also
+# runs on manual reload (`r` below), so check the invoking client's theme
+# rather than always falling back to dark and clobbering a light session.
+if -F "#{==:#{client_theme},light}" "source-file ~/.tmux-light.conf" "source-file ~/.tmux-dark.conf"
