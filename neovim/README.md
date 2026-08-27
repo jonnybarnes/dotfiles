@@ -39,6 +39,12 @@ machine gets the same set.
 
 ## Defaults worth knowing
 
+- **The colorscheme is catppuccin**, `flavour = 'auto'`: latte on a light
+  `background`, macchiato on a dark one. The TUI sets `background` from the
+  terminal at startup, so a fresh nvim matches the system appearance. A running
+  one does not follow a live change — but `:set background=light` (or `dark`)
+  swaps the flavour too, since Neovim reloads the colorscheme whenever
+  `background` is set.
 - **Spell checking is on globally**, `en_gb` — in every buffer, code included,
   not just prose filetypes.
 - **Autocompletion is on** via Neovim's own `vim.o.autocomplete`, with a rounded
