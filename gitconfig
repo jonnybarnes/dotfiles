@@ -2,13 +2,18 @@
     # list aliases
     aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /' | sort
     bdm = "!git branch --merged | grep -v '*' | xargs -n 1 git branch -d"
-    default-branch = "!git symbolic-ref refs/remotes/origin/HEAD | cut -d'/' -f4"
+    # Reads origin's cached HEAD, which `git sync` and remote.origin.followRemoteHEAD
+    # below keep pointing at whatever the server currently calls its default.
+    # --short over cut -d/ -f4, which mangles names like release/1.0.
+    default-branch = "!git symbolic-ref --short refs/remotes/origin/HEAD | sed 's|^origin/||'"
     lg = log --graph --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ar)%Creset'
     lg2 = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n' %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all
     lastchange = log -p --follow -n 1
     plog = log --graph --pretty='format:%C(red)%d%C(reset) %C(yellow)%h%C(reset) %ar %C(green)%aN%C(reset) %s'
     rank = shortlog -sn --no-merges
     st = status -sb
+    # `git sync` is not here - it is bin/git-sync, on the $PATH, which git picks
+    # up as a subcommand. `git aliases` above will not list it.
     tlog = log --stat --since='1 Day Ago' --graph --pretty=oneline --abbrev-commit --date=relative
 
 [apply]
@@ -34,6 +39,15 @@
 
 [pull]
     ff = only
+
+[remote "origin"]
+    # refs/remotes/origin/HEAD is written once at clone time, and the default
+    # `create` only fills it in when missing - so a default branch renamed on the
+    # server (main -> totara-20) leaves every tool reading that ref pointing at a
+    # branch that may not even exist. `always` re-points it on each fetch, off the
+    # ref advertisement that fetch already receives, so it costs no extra round
+    # trip. Only applies to remotes actually named origin.
+    followRemoteHEAD = always
 
 [core]
     pager = delta --side-by-side --width ${FZF_PREVIEW_COLUMNS-$COLUMNS}

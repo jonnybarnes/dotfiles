@@ -1,0 +1,67 @@
+#!/usr/bin/env zsh
+
+# Bring the default branch up to date in a fork-model repo, and keep my fork's
+# copy of it aligned: fast-forward it from whichever remote owns it, then push
+# it to origin. Named git-sync and installed on the $PATH, so git finds it as
+# `git sync`.
+
+set -e
+
+git rev-parse --git-dir > /dev/null
+
+# The branch belongs to upstream in a fork, and to origin when there is no
+# fork in play.
+if git remote get-url upstream > /dev/null 2>&1; then
+    source_remote=upstream
+else
+    source_remote=origin
+fi
+
+if ! git remote get-url origin > /dev/null 2>&1; then
+    echo "git sync: no 'origin' remote to sync" >&2
+    exit 1
+fi
+
+# Ask the server which branch is the default rather than reading
+# refs/remotes/<remote>/HEAD. That ref is a cache written at clone time, and
+# git does not refresh it when the default branch changes upstream - which is
+# the whole reason this script exists.
+branch=$(git ls-remote --symref $source_remote HEAD |
+    awk '/^ref:/ { sub("refs/heads/", "", $2); print $2; exit }')
+
+if [[ -z $branch ]]; then
+    echo "git sync: could not work out the default branch of $source_remote" >&2
+    exit 1
+fi
+
+echo "Syncing $branch from $source_remote"
+
+git fetch --prune $source_remote
+
+# Re-point the cached HEADs at what the server just told us, so `git
+# default-branch` and nvim's diff-against-branch prompt agree with this script.
+git remote set-head origin --auto > /dev/null
+if [[ $source_remote != origin ]]; then
+    git remote set-head $source_remote --auto > /dev/null
+fi
+
+# Be explicit about what the local branch tracks. A bare `git switch` has to
+# guess, and refuses to when several remotes carry the same branch name - which
+# they do as soon as a colleague's fork is added as a remote.
+if git show-ref --verify --quiet refs/heads/$branch; then
+    git switch $branch
+elif git show-ref --verify --quiet refs/remotes/origin/$branch; then
+    # Track origin, not upstream: this script keeps the fork's copy current, and
+    # it means a stray `git push` here goes somewhere I can actually write to.
+    git switch --create $branch --track origin/$branch
+else
+    git switch --create $branch --track $source_remote/$branch
+fi
+
+# Never a merge commit: if the default branch has diverged locally, that is
+# something to look at, not something to paper over.
+git merge --ff-only $source_remote/$branch
+
+if [[ $source_remote != origin ]]; then
+    git push origin $branch
+fi

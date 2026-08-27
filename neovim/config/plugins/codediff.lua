@@ -16,18 +16,35 @@ map('<leader>gd', '<Cmd>CodeDiff<CR>', 'Diff working tree')
 map('<leader>gh', '<Cmd>CodeDiff history %<CR>', 'File history')
 map('<leader>gH', '<Cmd>CodeDiff history<CR>', 'Branch history')
 
--- The base branch name varies per repo (main, master, develop, ...), so ask
--- the first remote's HEAD what it is rather than hardcoding one.
+-- A remote's cached HEAD, or nil if it has none. Kept current by
+-- remote.origin.followRemoteHEAD in the gitconfig and by `git sync`; without
+-- those this is whatever the default branch was at clone time.
+local function remote_head(remote)
+  local prefix = 'refs/remotes/' .. remote .. '/'
+  -- --quiet so a remote with no cached HEAD stays silent rather than having its
+  -- error text come back as the branch name.
+  local ref = vim.fn.systemlist('git symbolic-ref --quiet ' .. prefix .. 'HEAD')[1]
+  if not ref or ref:sub(1, #prefix) ~= prefix then
+    return nil
+  end
+  return ref:sub(#prefix + 1)
+end
+
+-- The base branch name varies per repo (main, master, totara-20, ...), so ask a
+-- remote rather than hardcoding one. origin first: in the fork workflow that is
+-- my fork, and `git sync` keeps its default branch level with upstream's. Only
+-- then upstream, then whatever remotes exist - `git remote` sorts them
+-- alphabetically, so first-available on its own can hand back a colleague's fork.
 local function default_branch()
-  local remote = vim.fn.systemlist('git remote')[1]
-  if not remote or remote == '' then
-    return ''
+  local candidates = { 'origin', 'upstream' }
+  vim.list_extend(candidates, vim.fn.systemlist('git remote'))
+  for _, remote in ipairs(candidates) do
+    local branch = remote_head(remote)
+    if branch then
+      return branch
+    end
   end
-  local ref = vim.fn.systemlist('git symbolic-ref refs/remotes/' .. remote .. '/HEAD')[1]
-  if not ref or ref == '' then
-    return ''
-  end
-  return ref:gsub('^refs/remotes/' .. remote .. '/', '')
+  return ''
 end
 
 map('<leader>gm', function()

@@ -57,6 +57,34 @@ variables, sourced from `.zshrc`. Keep git out of it:
 > `~/.gitconfig.lock` and spew `error: could not lock config file`. Put git
 > settings in `.gitconfig.local` instead.
 
+## Fork workflow
+
+Work repos are forks: `origin` is mine, `upstream` is the one PRs are raised
+against. `git sync` — `bin/git-sync`, found as a subcommand because it is on the
+`$PATH` — does the start-of-work dance:
+
+```
+git sync     # fast-forward the default branch from upstream, push it to origin
+```
+
+It asks the server which branch is the default rather than assuming `main`,
+fast-forwards only (a diverged default branch is something to look at, not to
+merge), and pushes to `origin` so the fork's copy matches. Then branch off it as
+usual, push the branch to `origin`, and raise the PR against `upstream`.
+
+The awkward part is that **git caches the default branch and does not refresh
+it**. `refs/remotes/origin/HEAD` is written once, at clone time; the default
+`remote.<name>.followRemoteHEAD = create` only fills it in when missing. So
+BuildEmpire/Totara renaming its default from `main` to `totara-20` left every
+clone still reporting `main` — `git default-branch` included. Two things fix
+that: `followRemoteHEAD = always` in the gitconfig re-points the ref on every
+fetch, and `git sync` sets it explicitly from what the server just said.
+
+Anything wanting the base branch should read that ref, and prefer `origin` when
+doing so. `git remote` sorts alphabetically, so picking the first remote in
+be-edition returns `kdog` — a colleague's fork. nvim's `<leader>gm`
+(diff-against-branch) tries `origin`, then `upstream`, then the rest.
+
 ## Light and dark mode
 
 Most of this is now handled natively and needs no configuration:
