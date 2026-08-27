@@ -10,17 +10,39 @@ SHOW_GIT=true           # git branch, dirty status, ahead/behind
 SHOW_TOKENS=true        # token usage bar
 SHOW_THINKING=true      # extended thinking indicator
 SHOW_RATE_LIMITS=true   # 5h / 7d rate limit bars
+SHOW_MODEL_LIMIT=true   # per-model weekly limit bar (e.g. Fable), when the API reports one
+WRAP_NARROW=true        # wrap onto a second line rather than dropping segments or being clipped
+WRAP_MIN_WIDTH=100      # below this, keep wide-tier line-one content (it can wrap)
 BRANCH_MAX_LEN=28       # truncate branch names longer than this
+CWD_MAX_LEN=20          # truncate the cwd basename longer than this
 GIT_CACHE_SECS=10       # seconds to cache git status (git diff is slow on large repos)
 TOKEN_BAR_WIDTH=8       # width of token progress bar
 
 # Terminal width detection.
-# Claude Code runs this script in a subprocess — COLUMNS is 0 and tput/stty
-# may not see the real TTY. When detection fails we default to 80 (safe/compact)
-# rather than wide, so the line never wraps.
+# Claude Code exports COLUMNS for this subprocess. There is no controlling
+# terminal, so the stty fallback fails; when both fail we default to 80
+# (safe/compact) rather than wide.
 #
-# To show more on a wider terminal, set TERM_WIDTH in settings.json:
+# The `padding` setting indents the status line on both sides, and Claude Code
+# applies it on top of COLUMNS rather than deducting it first — measured: with
+# COLUMNS=121 and padding 2, a 121-column line is clipped with an ellipsis. So
+# deduct it here, plus a column of margin.
+#
+# To override detection entirely, set TERM_WIDTH in settings.json:
 #   "command": "TERM_WIDTH=160 ~/.claude/statusline.sh"
+# Read both settings this script needs in one jq pass.
+# Only the user-level file: Claude Code also merges project .claude/settings.json,
+# .claude/settings.local.json and managed policy, so a statusLine.padding set at
+# project level would be applied by the renderer but missed here.
+sl_padding=0
+sl_thinking=false
+if [ -f "$HOME/.claude/settings.json" ]; then
+    { IFS= read -r sl_padding; IFS= read -r sl_thinking; } <<EOF
+$(jq -r '[(.statusLine.padding // 0), (.alwaysThinkingEnabled // false)] | .[] | tostring' "$HOME/.claude/settings.json" 2>/dev/null)
+EOF
+    [ "${sl_padding:-0}" -ge 0 ] 2>/dev/null || sl_padding=0
+fi
+
 if [ "${TERM_WIDTH:-0}" -le 0 ] 2>/dev/null; then
     if [ "${COLUMNS:-0}" -gt 0 ] 2>/dev/null; then
         TERM_WIDTH=$COLUMNS
@@ -30,6 +52,27 @@ if [ "${TERM_WIDTH:-0}" -le 0 ] 2>/dev/null; then
         unset _w
     fi
 fi
+
+# Usable width: minus padding on both sides, minus a column of margin.
+USABLE_WIDTH=$(( TERM_WIDTH - 2 * sl_padding - 1 ))
+[ "$USABLE_WIDTH" -lt 20 ] && USABLE_WIDTH=20
+
+# ${#str} counts characters only under a UTF-8 locale; under LC_ALL=C it counts
+# bytes, which would mis-measure the box/block glyphs and break line wrapping.
+case "${LC_ALL:-${LC_CTYPE:-${LANG:-}}}" in
+    *UTF-8*|*utf8*|*UTF8*) ;;
+    *)
+        # C.UTF-8 on glibc, en_US.UTF-8 on macOS (which has no C.UTF-8).
+        # Picking one that does not exist makes bash warn on every render and
+        # silently fall back to byte counting, so verify before committing.
+        for _loc in C.UTF-8 en_US.UTF-8; do
+            if LC_ALL="$_loc" locale charmap 2>/dev/null | grep -qi utf; then
+                export LC_ALL="$_loc"; break
+            fi
+        done
+        unset _loc
+        ;;
+esac
 
 input=$(cat)
 [ -z "$input" ] && printf "Claude" && exit 0
@@ -69,6 +112,31 @@ format_tokens() {
     else
         printf "%d" "$num"
     fi
+}
+
+# Display width of a string, ignoring ANSI colour escapes. Every glyph the
+# statusline uses is single-width, so a character count is the display width.
+#
+# The colour vars hold the escapes as literal backslash-033 text (they are
+# single-quoted, and printf %b only interprets them when the line is finally
+# emitted), so strip that literal form as well as a real ESC byte.
+vis_len() {
+    local plain
+    plain=$(printf '%s' "$1" | sed -e 's/\\033\[[0-9;]*m//g' -e $'s/\033\[[0-9;]*m//g' -e 's/\\\\/\\/g')
+    printf '%d' "${#plain}"
+}
+
+# printf %b interprets backslash escapes -- that is how the colour variables
+# above are applied. Data from the API or the filesystem must NOT be
+# interpreted: a directory or model name containing a literal \n would split
+# the line, breaking both the width measurement and the two-line guarantee.
+# Double the backslashes so %b renders them literally.
+esc_data() {
+    local v="$1"
+    # Real control characters (jq decodes \n in the JSON payload into an actual
+    # newline) would split the line regardless of escaping, so drop them first.
+    v="${v//$'\n'/ }"; v="${v//$'\r'/ }"; v="${v//$'\t'/ }"; v="${v//$'\033'/}"
+    printf '%s' "${v//\\/\\\\}"
 }
 
 truncate_str() {
@@ -242,25 +310,40 @@ total_tokens=$(format_tokens $size)
 pct_used=$(( size > 0 ? current * 100 / size : 0 ))
 
 thinking_on=false
-settings_path="$HOME/.claude/settings.json"
-if [ -f "$settings_path" ]; then
-    thinking_val=$(jq -r '.alwaysThinkingEnabled // false' "$settings_path" 2>/dev/null)
-    [ "$thinking_val" = "true" ] && thinking_on=true
-fi
+[ "$sl_thinking" = "true" ] && thinking_on=true
 
 # ===== Adaptive width tiers =====
 #
-# Tiers (tuned so each tier's max output fits within its min width):
+# Tiers now choose only how much of LINE ONE to show. What the rate-limit
+# group contains, and whether it wraps, is decided by measurement at the end of
+# the script, not here -- tiers cannot see how long the branch, cwd or model
+# name is, which is how content used to end up clipped.
 #
-#  full    (≥150): CWD, ahead/behind, "◆ thinking", 5h+7d+resets, cost
-#  wide    (100–149): ahead/behind, "◆ thinking", 5h+7d bars, cost
-#  split   (70–99):  short model, ahead/behind, "◆" symbol, 5h+7d bars
-#  narrow  (<70):  short model + branch + token only
+#  full    (≥150): CWD, ahead/behind, "◆ thinking", cost
+#  wide    (100–149): ahead/behind, "◆ thinking", cost
+#  split   (76–99):  short model, ahead/behind, "◆" symbol
+#                    (reachable only with WRAP_NARROW=false; otherwise the wrap
+#                     band below overrides this range to wide)
+#  narrow  (<76):  short model + branch + token only; no rate limits at all
 #
-if   [ "$TERM_WIDTH" -ge 150 ] 2>/dev/null; then width_tier="full"
-elif [ "$TERM_WIDTH" -ge 100 ] 2>/dev/null; then width_tier="wide"
-elif [ "$TERM_WIDTH" -ge 76  ] 2>/dev/null; then width_tier="split"
+if   [ "$USABLE_WIDTH" -ge 150 ] 2>/dev/null; then width_tier="full"
+elif [ "$USABLE_WIDTH" -ge 100 ] 2>/dev/null; then width_tier="wide"
+elif [ "$USABLE_WIDTH" -ge 76  ] 2>/dev/null; then width_tier="split"
 else                                              width_tier="narrow"
+fi
+
+# Two-line mode. Between WRAP_FLOOR and WRAP_MIN_WIDTH there isn't room for
+# everything on one line, but there IS room across two — so instead of dropping
+# the rate-limit group we break before it and render the wide-tier content.
+# Below WRAP_FLOOR the narrow tier applies instead, which drops the rate-limit
+# group entirely -- so there is nothing to wrap and no second line to put it on.
+WRAP_FLOOR=68
+wrap_mode=false
+if $WRAP_NARROW \
+   && [ "$USABLE_WIDTH" -lt "$WRAP_MIN_WIDTH" ] 2>/dev/null \
+   && [ "$USABLE_WIDTH" -ge "$WRAP_FLOOR" ] 2>/dev/null; then
+    wrap_mode=true
+    width_tier="wide"
 fi
 
 # Shorten model name for tight spaces
@@ -274,7 +357,13 @@ short_model() {
 }
 
 # ===== Build output =====
+# Explicitly empty: bash imports same-named environment variables, and a
+# stray $rl_lean would otherwise leak into the rendered line.
 out=""
+rl_bare=""
+rl_lean=""
+rl_mid=""
+rl_rich=""
 
 # Model — color by family
 model_color="$blue"
@@ -284,14 +373,20 @@ case "$model_name" in
 esac
 
 display_model="$model_name"
-# split/narrow: shorten so the 5h + 7d bars still fit on one line
-[ "$width_tier" = "split" -o "$width_tier" = "narrow" ] && display_model=$(short_model "$model_name")
-out+="${model_color}${display_model}${reset}"
+# split/narrow: shorten so the 5h + 7d bars still fit on one line.
+# wrap mode too: it renders wide-tier content at a split-tier width, and a long
+# display name ("Opus 5 (1M context)" is 19 cols) would overflow line one.
+if [ "$width_tier" = "split" -o "$width_tier" = "narrow" ] || $wrap_mode; then
+    display_model=$(short_model "$model_name")
+fi
+out+="${model_color}$(esc_data "$display_model")${reset}"
 
 # CWD — full tier only (branch name gives enough context below that)
 if [ "$width_tier" = "full" ] && [ -n "$cwd" ]; then
-    display_dir="${cwd##*/}"
-    out+="${sep}${dim}${display_dir}${reset}"
+    # Capped like the branch name: nothing else shortens line one, so an
+    # unusually long project directory would push it past the terminal edge.
+    display_dir=$(truncate_str "${cwd##*/}" "$CWD_MAX_LEN")
+    out+="${sep}${dim}$(esc_data "$display_dir")${reset}"
 fi
 
 # Git branch + dirty + ahead/behind
@@ -305,9 +400,17 @@ if $SHOW_GIT && [ -n "$cwd" ]; then
         [ "$width_tier" = "wide"   ] && local_max=24
         [ "$width_tier" = "split"  ] && local_max=18
         [ "$width_tier" = "narrow" ] && local_max=12
+        # In wrap mode line one is model+branch+tokens+thinking+cost; with the
+        # shortened model name everything but the branch is ~56 cols, so give
+        # the branch whatever is left.
+        if $wrap_mode; then
+            local_max=$(( USABLE_WIDTH - 56 ))
+            [ "$local_max" -lt 8  ] && local_max=8
+            [ "$local_max" -gt 24 ] && local_max=24
+        fi
         g_branch_display=$(truncate_str "$g_branch" "$local_max")
 
-        out+="${sep}${dim}⎇${reset} ${magenta}${g_branch_display}${reset}"
+        out+="${sep}${dim}⎇${reset} ${magenta}$(esc_data "$g_branch_display")${reset}"
 
         if [ "$g_dirty" = "dirty" ]; then
             out+=" ${red}✗${reset}"
@@ -355,7 +458,8 @@ if [ -n "$cost_usd" ] && [ "$width_tier" = "wide" -o "$width_tier" = "full" ]; t
 fi
 
 # ===== Rate limits (API, cached 60s) =====
-# shown in full/wide/split; hidden only in narrow
+# Built at every tier except narrow. Which variant is actually emitted,
+# and on how many lines, is decided by the measured ladder at the end.
 if $SHOW_RATE_LIMITS && [ "$width_tier" != "narrow" ]; then
     api_cache="/tmp/claude/statusline-usage-cache.json"
     api_cache_max=3600  # 1 hour — rate limit data changes slowly
@@ -405,37 +509,121 @@ if $SHOW_RATE_LIMITS && [ "$width_tier" != "narrow" ]; then
         bar_width=6
         [ "$width_tier" = "split" ] && bar_width=4
 
-        five_hour_pct=$(echo "$usage_data"       | jq -r '.five_hour.utilization // 0' | awk '{printf "%.0f", $1}')
-        five_hour_reset_iso=$(echo "$usage_data" | jq -r '.five_hour.resets_at // empty')
-        five_hour_bar=$(build_bar "$five_hour_pct" "$bar_width")
-        out+="${sep}${dim}5h${reset} ${five_hour_bar} ${cyan}${five_hour_pct}%${reset}"
-        # Reset time: full only — below that the 7d bar uses the space instead
-        if [ "$width_tier" = "full" ]; then
+        # One jq pass for the whole payload. Parsing it field by field meant
+        # ~10 jq processes per render on the same JSON; the status line runs on
+        # every redraw, so that was the dominant cost. Rounding happens in jq
+        # too, which removes the per-field awk calls.
+        #
+        # The per-model weekly limit (e.g. Fable) lives in .limits[] under kind
+        # "weekly_scoped" -- the legacy seven_day_opus / seven_day_sonnet fields
+        # are always null now. Prefer an is_active entry, else take the first.
+        # `.limits[]?` tolerates limits being absent or not an array, and
+        # `tonumber? // 0` tolerates a percentage arriving as a string.
+        # One field per line, not @tsv: tab is IFS whitespace, so `read` collapses
+        # runs of it and an empty field (no scoped limit -> empty display name)
+        # would silently shift every later field along by one.
+        {
+            IFS= read -r five_hour_pct
+            IFS= read -r seven_day_pct
+            IFS= read -r five_hour_reset_iso
+            IFS= read -r seven_day_reset_iso
+            IFS= read -r scoped_name
+            IFS= read -r scoped_pct
+            IFS= read -r extra_enabled
+            IFS= read -r extra_pct
+            IFS= read -r extra_used
+            IFS= read -r extra_limit
+        } <<EOF
+$(echo "$usage_data" | jq -r '
+    def num: (tonumber? // 0);
+    ([.limits[]? | select(.kind == "weekly_scoped")]
+       | (map(select(.is_active)) + .) | first) as $scoped
+    | [ (.five_hour.utilization  | num | round),
+        (.seven_day.utilization  | num | round),
+        (.five_hour.resets_at // ""),
+        (.seven_day.resets_at // ""),
+        (($scoped.scope.model.display_name // "") | gsub("[\\n\\r\\t]"; " ")),
+        ($scoped.percent | num | round),
+        (.extra_usage.is_enabled // false),
+        (.extra_usage.utilization | num | round),
+        ((.extra_usage.used_credits  | num) / 100 * 100 | round / 100),
+        ((.extra_usage.monthly_limit | num) / 100 * 100 | round / 100)
+      ] | .[] | tostring' 2>/dev/null)
+EOF
+
+        # Three variants of the rate-limit group, richest first:
+        #   rl_rich  bars + reset times + extra usage
+        #   rl_mid   bars + extra usage
+        #   rl_lean  bars only
+        # The ladder at the end emits the richest one that fits the space it
+        # has. Keeping a lean variant matters: extra-usage credits add ~30
+        # columns, which can overflow line two on its own.
+        seg_5h="${dim}5h${reset} $(build_bar "${five_hour_pct:-0}" "$bar_width") ${cyan}${five_hour_pct:-0}%${reset}"
+        seg_7d="${sep}${dim}7d${reset} $(build_bar "${seven_day_pct:-0}" "$bar_width") ${cyan}${seven_day_pct:-0}%${reset}"
+
+        # Rendered inside the 7d segment rather than as its own: both are weekly
+        # limits resetting at the same time, so one shared reset label covers
+        # the pair and saves a separator plus a second timestamp.
+        seg_scoped=""
+        if $SHOW_MODEL_LIMIT && [ -n "$scoped_name" ]; then
+            seg_scoped=" ${dim}$(esc_data "$(truncate_str "$scoped_name" 8)")${reset} $(build_bar "${scoped_pct:-0}" "$bar_width") ${cyan}${scoped_pct:-0}%${reset}"
+        fi
+
+        # Extra usage, when the account has it enabled.
+        seg_extra=""
+        if [ "$extra_enabled" = "true" ]; then
+            seg_extra="${sep}${dim}extra${reset} $(build_bar "${extra_pct:-0}" "$bar_width") ${cyan}\$$(printf '%.2f' "${extra_used:-0}")${dim}/\$$(printf '%.2f' "${extra_limit:-0}")${reset}"
+        fi
+
+        # rl_bare drops the per-model bar too: the last thing worth giving up,
+        # and the only way to fit at all when wrapping is disabled and the
+        # terminal is narrow.
+        rl_bare="${seg_5h}${seg_7d}"
+        rl_lean="${rl_bare}${seg_scoped}"
+        rl_mid="${rl_lean}${seg_extra}"
+        rl_rich="$rl_mid"
+
+        # Formatting the two reset timestamps costs ~10 subprocesses (date has
+        # no portable one-shot form here), so only pay for it when there is a
+        # chance they will be shown: appended to line one, or alone on line two.
+        # RESET_COST is the combined width of " reset 4:40p.m." and
+        # " reset aug 28, 3:00a.m.".
+        line1_len=$(vis_len "$out")
+        mid_len=$(vis_len "$rl_mid")
+        RESET_COST=30
+        if [ $(( line1_len + 3 + mid_len + RESET_COST )) -le "$USABLE_WIDTH" ] \
+           || { $WRAP_NARROW && [ $(( mid_len + RESET_COST )) -le "$USABLE_WIDTH" ]; }; then
             five_hour_reset=$(format_reset_time "$five_hour_reset_iso" "time")
-            [ -n "$five_hour_reset" ] && out+=" ${dim}↺ ${five_hour_reset}${reset}"
-        fi
-
-        # 7d bar: all tiers (mirrors 5h); reset time: full only
-        seven_day_pct=$(echo "$usage_data" | jq -r '.seven_day.utilization // 0' | awk '{printf "%.0f", $1}')
-        seven_day_bar=$(build_bar "$seven_day_pct" "$bar_width")
-        out+="${sep}${dim}7d${reset} ${seven_day_bar} ${cyan}${seven_day_pct}%${reset}"
-        if [ "$width_tier" = "full" ]; then
-            seven_day_reset_iso=$(echo "$usage_data" | jq -r '.seven_day.resets_at // empty')
             seven_day_reset=$(format_reset_time "$seven_day_reset_iso" "datetime")
-            [ -n "$seven_day_reset" ] && out+=" ${dim}↺ ${seven_day_reset}${reset}"
+            r5=""; [ -n "$five_hour_reset" ]  && r5=" ${dim}↺ ${five_hour_reset}${reset}"
+            r7=""; [ -n "$seven_day_reset" ] && r7=" ${dim}↺ ${seven_day_reset}${reset}"
+            rl_rich="${seg_5h}${r5}${seg_7d}${seg_scoped}${r7}${seg_extra}"
         fi
+    fi
+fi
 
-        # Extra usage: full only
-        if [ "$width_tier" = "full" ]; then
-            extra_enabled=$(echo "$usage_data" | jq -r '.extra_usage.is_enabled // false')
-            if [ "$extra_enabled" = "true" ]; then
-                extra_pct=$(echo "$usage_data"   | jq -r '.extra_usage.utilization // 0'   | awk '{printf "%.0f", $1}')
-                extra_used=$(echo "$usage_data"  | jq -r '.extra_usage.used_credits // 0'  | awk '{printf "%.2f", $1/100}')
-                extra_limit=$(echo "$usage_data" | jq -r '.extra_usage.monthly_limit // 0' | awk '{printf "%.2f", $1/100}')
-                extra_bar=$(build_bar "$extra_pct" "$bar_width")
-                out+="${sep}${dim}extra${reset} ${extra_bar} ${cyan}\$${extra_used}${dim}/\$${extra_limit}${reset}"
-            fi
+# Attach the rate-limit group, emitting the richest layout that fits:
+#   1-3. one line: with resets / with extra usage / bars only
+#   4-6. two lines: same order, line two having room the single line lacked
+# Every branch is fit-checked, so no layout is chosen that would be clipped by
+# the renderer, whatever the branch name, cwd, model name or extra-usage width.
+if [ -n "$rl_bare" ]; then
+    rich_len=$(vis_len "$rl_rich")
+    lean_len=$(vis_len "$rl_lean")
+    bare_len=$(vis_len "$rl_bare")
+    if   [ $(( line1_len + 3 + rich_len )) -le "$USABLE_WIDTH" ]; then out+="${sep}${rl_rich}"
+    elif [ $(( line1_len + 3 + mid_len  )) -le "$USABLE_WIDTH" ]; then out+="${sep}${rl_mid}"
+    elif [ $(( line1_len + 3 + lean_len )) -le "$USABLE_WIDTH" ]; then out+="${sep}${rl_lean}"
+    elif [ $(( line1_len + 3 + bare_len )) -le "$USABLE_WIDTH" ]; then out+="${sep}${rl_bare}"
+    elif $WRAP_NARROW; then
+        if   [ "$rich_len" -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_rich"
+        elif [ "$mid_len"  -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_mid"
+        elif [ "$lean_len" -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_lean"
+        else                                          out+=$'\n'"$rl_bare"
         fi
+    else
+        # Wrapping disabled: the barest group is the least-bad single line.
+        out+="${sep}${rl_bare}"
     fi
 fi
 
