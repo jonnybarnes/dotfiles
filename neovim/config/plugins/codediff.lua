@@ -1,15 +1,20 @@
-vim.pack.add({ 'https://github.com/sindrets/diffview.nvim' })
+vim.pack.add({ 'https://github.com/esmuellert/codediff.nvim' })
 
-require('diffview').setup()
+require('codediff').setup({
+  keymaps = {
+    -- q closes the diff tab from inside it; <leader>gc is here too so the
+    -- same key that opened things from the g/diff group also shuts them.
+    view = { quit = { 'q', '<leader>gc' } },
+  },
+})
 
 local function map(lhs, rhs, desc)
   vim.keymap.set('n', lhs, rhs, { desc = desc })
 end
 
-map('<leader>gd', '<Cmd>DiffviewOpen<CR>', 'Diff against index')
-map('<leader>gc', '<Cmd>DiffviewClose<CR>', 'Close diff view')
-map('<leader>gh', '<Cmd>DiffviewFileHistory %<CR>', 'File history')
-map('<leader>gH', '<Cmd>DiffviewFileHistory<CR>', 'Branch history')
+map('<leader>gd', '<Cmd>CodeDiff<CR>', 'Diff working tree')
+map('<leader>gh', '<Cmd>CodeDiff history %<CR>', 'File history')
+map('<leader>gH', '<Cmd>CodeDiff history<CR>', 'Branch history')
 
 -- The base branch name varies per repo (main, master, develop, ...), so ask
 -- the first remote's HEAD what it is rather than hardcoding one.
@@ -28,7 +33,9 @@ end
 map('<leader>gm', function()
   vim.ui.input({ prompt = 'Diff against: ', default = default_branch() }, function(rev)
     if rev and rev ~= '' then
-      vim.cmd('DiffviewOpen ' .. rev .. '...HEAD')
+      -- rev...HEAD is merge-base semantics: what this branch added, not what
+      -- the base branch has moved on to since.
+      vim.cmd('CodeDiff ' .. rev .. '...HEAD')
     end
   end)
 end, 'Diff against branch')

@@ -37,6 +37,12 @@ machine gets the same set.
 > nvim-web-devicons needs a Nerd Font in the terminal or the icons render as
 > tofu. `brew.sh` installs one for ghostty.
 
+> [!NOTE]
+> codediff.nvim does its diffing in C. It downloads a prebuilt library into its
+> own plugin directory on first use — so the first `:CodeDiff` on a new machine
+> needs network, and the binary is not covered by the lock file. `:CodeDiff
+> install!` forces a re-download if it ever goes missing or stale.
+
 ## Defaults worth knowing
 
 - **The colorscheme is catppuccin**, `flavour = 'auto'`: latte on a light
