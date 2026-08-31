@@ -47,6 +47,12 @@
     # branch that may not even exist. `always` re-points it on each fetch, off the
     # ref advertisement that fetch already receives, so it costs no extra round
     # trip. Only applies to remotes actually named origin.
+    #
+    # Side effect: git conjures a remote from the existence of any remote.<name>.*
+    # key, so this makes `git remote` list a URL-less origin in every repo that
+    # has not got one - this repo included. Nothing breaks (`git remote get-url
+    # origin` still says No such remote, which is what the scripts test), but do
+    # not read that listing as evidence a real origin exists.
     followRemoteHEAD = always
 
 [core]
