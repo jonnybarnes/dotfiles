@@ -56,3 +56,41 @@ map('<leader>gm', function()
     end
   end)
 end, 'Diff against branch')
+
+-- A commit-ish under the cursor, or nil. Lets <leader>gr be pressed straight on
+-- a sha pasted in a commit message, a code comment or a fugitive/log buffer.
+-- ^{commit} so a tag or tree does not pass as something diffable, and --quiet
+-- so a cword like 'function' fails silently instead of shouting.
+local function commit_under_cursor()
+  local cword = vim.fn.expand('<cword>')
+  if cword == '' then
+    return nil
+  end
+  vim.fn.systemlist('git rev-parse --verify --quiet ' .. vim.fn.shellescape(cword) .. '^{commit}')
+  if vim.v.shell_error ~= 0 then
+    return nil
+  end
+  return cword
+end
+
+map('<leader>gr', function()
+  local default = commit_under_cursor() or 'HEAD'
+  vim.ui.input({ prompt = 'Review commit: ', default = default }, function(rev)
+    if rev and rev ~= '' then
+      -- rev^ rev, not `history`, so the explorer opens on that one commit's
+      -- files. A merge commit diffs against its first parent, as git does.
+      vim.cmd('CodeDiff ' .. rev .. '^ ' .. rev)
+    end
+  end)
+end, 'Review a commit')
+
+map('<leader>gR', function()
+  vim.ui.input({ prompt = 'Commits since: ', default = default_branch() }, function(rev)
+    if rev and rev ~= '' then
+      -- Commit-by-commit rather than squashed: the history panel lists each
+      -- commit the branch is missing, oldest first, so they read in the order
+      -- they were made.
+      vim.cmd('CodeDiff history ' .. rev .. '..HEAD --reverse')
+    end
+  end)
+end, 'Review commits since branch')
