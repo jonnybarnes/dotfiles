@@ -302,6 +302,10 @@ format_reset_time() {
 model_name=$(echo "$input" | jq -r '.model.display_name // "Claude"')
 cwd=$(echo "$input"        | jq -r '.cwd // empty')
 cost_usd=$(echo "$input"   | jq -r '.cost.total_cost_usd // empty')
+# Formatted here rather than where it is rendered: the wrap-mode branch budget
+# needs its width, and it is not fixed ("$4.61" vs "$1234.56").
+cost_fmt=""
+[ -n "$cost_usd" ] && cost_fmt=$(printf '%.2f' "$cost_usd" 2>/dev/null)
 
 size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
 [ "$size" -eq 0 ] 2>/dev/null && size=200000
@@ -395,6 +399,11 @@ if [ "$width_tier" = "full" ] && [ -n "$cwd" ]; then
     out+="${sep}${dim}$(esc_data "$display_dir")${reset}"
 fi
 
+bar_w="$TOKEN_BAR_WIDTH"
+[ "$width_tier" = "wide"   ] && bar_w=6
+[ "$width_tier" = "split"  ] && bar_w=5
+[ "$width_tier" = "narrow" ] && bar_w=4
+
 # Git branch + dirty + ahead/behind
 if $SHOW_GIT && [ -n "$cwd" ]; then
     git_info=$(get_git_info "$cwd")
@@ -406,11 +415,21 @@ if $SHOW_GIT && [ -n "$cwd" ]; then
         [ "$width_tier" = "wide"   ] && local_max=24
         [ "$width_tier" = "split"  ] && local_max=18
         [ "$width_tier" = "narrow" ] && local_max=12
-        # In wrap mode line one is model+branch+tokens+thinking+cost; with the
-        # shortened model name everything but the branch is ~56 cols, so give
-        # the branch whatever is left.
+        # In wrap mode line one is
+        #   model │ ⎇ branch ✔ ↑1 │ <bar> used/total pct% │ ◇ thinking │ $cost
+        # and the branch gets whatever the rest of it leaves. Everything after
+        # the branch is appended below, so its width is added up here rather
+        # than assumed: a flat 56 columns was three short of a four-digit cost,
+        # which pushed line one past the edge to be clipped by the renderer.
         if $wrap_mode; then
-            local_max=$(( USABLE_WIDTH - 56 ))
+            tail_len=$(( 5 + 2 ))                  # "│ ⎇ " and the dirty mark
+            [ "${g_ahead:-0}"  -gt 0 ] && tail_len=$(( tail_len + 2 + ${#g_ahead} ))
+            [ "${g_behind:-0}" -gt 0 ] && tail_len=$(( tail_len + 2 + ${#g_behind} ))
+            $SHOW_TOKENS && tail_len=$(( tail_len + 3 + bar_w + 1 \
+                + ${#used_tokens} + 1 + ${#total_tokens} + 1 + ${#pct_used} + 1 ))
+            $SHOW_THINKING && tail_len=$(( tail_len + 3 + 10 ))
+            [ -n "$cost_fmt" ] && tail_len=$(( tail_len + 3 + 1 + ${#cost_fmt} ))
+            local_max=$(( USABLE_WIDTH - $(vis_len "$out") - tail_len ))
             [ "$local_max" -lt 8  ] && local_max=8
             [ "$local_max" -gt 24 ] && local_max=24
         fi
@@ -434,10 +453,6 @@ fi
 
 # Token bar
 if $SHOW_TOKENS; then
-    bar_w="$TOKEN_BAR_WIDTH"
-    [ "$width_tier" = "wide"   ] && bar_w=6
-    [ "$width_tier" = "split"  ] && bar_w=5
-    [ "$width_tier" = "narrow" ] && bar_w=4
     token_bar=$(build_bar "$pct_used" "$bar_w")
     out+="${sep}${token_bar} ${orange}${used_tokens}${dim}/${reset}${white}${total_tokens}${reset} ${dim}${pct_used}%${reset}"
 fi
@@ -458,9 +473,8 @@ if $SHOW_THINKING && [ "$width_tier" != "narrow" ]; then
 fi
 
 # Session cost — wide/full only
-if [ -n "$cost_usd" ] && [ "$width_tier" = "wide" -o "$width_tier" = "full" ]; then
-    cost_fmt=$(printf '%.2f' "$cost_usd" 2>/dev/null)
-    [ -n "$cost_fmt" ] && out+="${sep}${dim}\$${cost_fmt}${reset}"
+if [ -n "$cost_fmt" ] && [ "$width_tier" = "wide" -o "$width_tier" = "full" ]; then
+    out+="${sep}${dim}\$${cost_fmt}${reset}"
 fi
 
 # ===== Rate limits (API, cached 60s) =====

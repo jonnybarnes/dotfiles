@@ -86,5 +86,9 @@ for u in 200 150 116 100 85 68; do check "$u" "$LONG" "$M2" 4.61; done
 check 40 "$LONG" "$M2" 4.61 "narrow tier floor ~43 cols with a long branch"
 echo "Large cost figure:"
 for u in 116 85 68; do check "$u" "$SHORT" "$M1" 1234.56; done
+# ... and with a long branch, which is what makes the wrap-mode branch budget
+# bite: a four-digit cost is three columns wider than the budget assumed.
+echo "Large cost figure with a long branch:"
+for u in 68 69 70 75 85; do check "$u" "$LONG" "$M1" 1234.56; done
 
 echo; echo "pass=$pass fail=$fail"; [ "$fail" -eq 0 ]
