@@ -18,6 +18,12 @@ CWD_MAX_LEN=20          # truncate the cwd basename longer than this
 GIT_CACHE_SECS=10       # seconds to cache git status (git diff is slow on large repos)
 TOKEN_BAR_WIDTH=8       # width of token progress bar
 
+# Where the git and usage-API caches live. Overridable via the environment so a
+# test run can render into its own directory: ~/.claude/statusline.sh is a
+# symlink to this script, so a fixture written to the live cache is picked up by
+# the next redraw and shown as real usage for up to an hour.
+CACHE_DIR="${STATUSLINE_CACHE_DIR:-/tmp/claude}"
+
 # Terminal width detection.
 # Claude Code exports COLUMNS for this subprocess. There is no controlling
 # terminal, so the stty fallback fails; when both fail we default to 80
@@ -77,7 +83,7 @@ esac
 input=$(cat)
 [ -z "$input" ] && printf "Claude" && exit 0
 
-mkdir -p /tmp/claude
+mkdir -p "$CACHE_DIR"
 
 # ===== Colors =====
 # Palette indices rather than RGB, so these resolve through the terminal's own
@@ -173,7 +179,7 @@ get_git_info() {
     # Stable cache key per directory path
     local dir_hash
     dir_hash=$(printf '%s' "$dir" | cksum | awk '{print $1}')
-    local cache_file="/tmp/claude/git-${dir_hash}"
+    local cache_file="$CACHE_DIR/git-${dir_hash}"
 
     local needs_refresh=true
     if [ -f "$cache_file" ]; then
@@ -461,7 +467,7 @@ fi
 # Built at every tier except narrow. Which variant is actually emitted,
 # and on how many lines, is decided by the measured ladder at the end.
 if $SHOW_RATE_LIMITS && [ "$width_tier" != "narrow" ]; then
-    api_cache="/tmp/claude/statusline-usage-cache.json"
+    api_cache="$CACHE_DIR/statusline-usage-cache.json"
     api_cache_max=3600  # 1 hour — rate limit data changes slowly
     needs_refresh=true
     usage_data=""
@@ -602,19 +608,26 @@ EOF
     fi
 fi
 
-# Attach the rate-limit group, emitting the richest layout that fits:
-#   1-3. one line: with resets / with extra usage / bars only
+# Attach the rate-limit group, emitting the richest layout that fits.
+#
+# A second line is worth it for the per-model bar and nothing else: rl_bare is
+# the only variant that drops that bar, and it is the whole reason the group is
+# worth showing on an account that has one. Reset times and extra-usage credits
+# are given up instead of wrapped for, so content is NOT monotone in width -- at
+# one column narrower, rung 3 stops fitting and the wrap that follows has room
+# for the timestamps as well. Only wrapping being switched off makes rl_bare the
+# answer.
+#   1-3. one line:  with resets / with extra usage / bars + per-model
 #   4-6. two lines: same order, line two having room the single line lacked
+#   7.   one line, bars only -- WRAP_NARROW=false, the least-bad single line
 # Every branch is fit-checked, so no layout is chosen that would be clipped by
 # the renderer, whatever the branch name, cwd, model name or extra-usage width.
 if [ -n "$rl_bare" ]; then
     rich_len=$(vis_len "$rl_rich")
     lean_len=$(vis_len "$rl_lean")
-    bare_len=$(vis_len "$rl_bare")
     if   [ $(( line1_len + 3 + rich_len )) -le "$USABLE_WIDTH" ]; then out+="${sep}${rl_rich}"
     elif [ $(( line1_len + 3 + mid_len  )) -le "$USABLE_WIDTH" ]; then out+="${sep}${rl_mid}"
     elif [ $(( line1_len + 3 + lean_len )) -le "$USABLE_WIDTH" ]; then out+="${sep}${rl_lean}"
-    elif [ $(( line1_len + 3 + bare_len )) -le "$USABLE_WIDTH" ]; then out+="${sep}${rl_bare}"
     elif $WRAP_NARROW; then
         if   [ "$rich_len" -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_rich"
         elif [ "$mid_len"  -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_mid"
@@ -622,7 +635,6 @@ if [ -n "$rl_bare" ]; then
         else                                          out+=$'\n'"$rl_bare"
         fi
     else
-        # Wrapping disabled: the barest group is the least-bad single line.
         out+="${sep}${rl_bare}"
     fi
 fi

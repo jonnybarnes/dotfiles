@@ -12,17 +12,14 @@
 # Asserting invariants rather than fixed line counts keeps these from rotting
 # every time a segment's content changes.
 SCRIPT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/statusline.isaacaudet.sh"
-CACHE="/tmp/claude/statusline-usage-cache.json"
 PAD=$(jq -r '.statusLine.padding // 0' "$HOME/.claude/settings.json" 2>/dev/null || echo 0)
 OVERHEAD=$(( 2 * PAD + 1 ))
-BACKUP=$(mktemp); [ -f "$CACHE" ] && cp "$CACHE" "$BACKUP"
+# Throwaway cache directory, so fixtures never reach the live status line's
+# cache (~/.claude/statusline.sh is a symlink to the script under test).
+export STATUSLINE_CACHE_DIR=$(mktemp -d)
+CACHE="$STATUSLINE_CACHE_DIR/statusline-usage-cache.json"
 REPO=$(mktemp -d)
-# If there was no cache to begin with, REMOVE the fixture rather than leaving
-# it: the status line would treat it as a fresh response for up to an hour.
-cleanup() {
-    if [ -s "$BACKUP" ]; then cp "$BACKUP" "$CACHE"; else rm -f "$CACHE"; fi
-    rm -f "$BACKUP"; rm -rf "$REPO"
-}
+cleanup() { rm -rf "$STATUSLINE_CACHE_DIR" "$REPO"; }
 trap cleanup EXIT
 
 cat > "$CACHE" <<'JSON'
@@ -44,7 +41,7 @@ pass=0; fail=0
 check() { # usable, branch, model, cost, [xfail-reason]
     local u="$1" branch="$2" model="$3" cost="$4" xfail="${5:-}"
     local w=$(( u + OVERHEAD ))
-    git -C "$REPO" checkout -q -B "$branch" 2>/dev/null; rm -f /tmp/claude/git-*
+    git -C "$REPO" checkout -q -B "$branch" 2>/dev/null; rm -f "$STATUSLINE_CACHE_DIR"/git-*
     local stdin="{\"model\":{\"display_name\":\"$model\"},\"cwd\":\"$REPO\",\"cost\":{\"total_cost_usd\":$cost},\"context_window\":{\"context_window_size\":200000,\"current_usage\":{\"input_tokens\":45000,\"cache_read_input_tokens\":30000}}}"
     local out ws n mx=0 over=0
     out=$(TERM_WIDTH=$w bash "$SCRIPT" <<<"$stdin")

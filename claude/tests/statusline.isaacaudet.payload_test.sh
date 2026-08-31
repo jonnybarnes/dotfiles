@@ -9,18 +9,14 @@
 # particular the per-model ("weekly_scoped") limit such as Fable, and how the
 # renderer degrades when the group will not fit.
 SCRIPT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/statusline.isaacaudet.sh"
-CACHE="/tmp/claude/statusline-usage-cache.json"
-BACKUP="$(mktemp)"
+# Render into a throwaway cache directory. The live cache must not be touched:
+# ~/.claude/statusline.sh is a symlink to the script under test, so a fixture
+# written there is shown in the running TUI as real usage until it expires.
+export STATUSLINE_CACHE_DIR="$(mktemp -d)"
+CACHE="$STATUSLINE_CACHE_DIR/statusline-usage-cache.json"
 REPO="$(mktemp -d)"
-[ -f "$CACHE" ] && cp "$CACHE" "$BACKUP"
 
-# Restore the real cache. If there was no cache to begin with, REMOVE the
-# fixture rather than leaving it: the status line treats a fixture as a fresh
-# response for api_cache_max (1h) and would report fabricated usage.
-cleanup() {
-    if [ -s "$BACKUP" ]; then cp "$BACKUP" "$CACHE"; else rm -f "$CACHE"; fi
-    rm -f "$BACKUP"; rm -rf "$REPO"
-}
+cleanup() { rm -rf "$STATUSLINE_CACHE_DIR" "$REPO"; }
 trap cleanup EXIT
 
 git -C "$REPO" init -q 2>/dev/null
@@ -79,6 +75,16 @@ case "$(nth "$out" 2)" in *"Fable"*"10%"*) ok "narrow: Fable is on line two" ;;
                           *) bad "narrow: Fable is on line two" "$out" ;; esac
 case "$(nth "$out" 1)" in *"Fable"*) bad "narrow: Fable not duplicated on line one" "$out" ;;
                           *) ok "narrow: Fable not duplicated on line one" ;; esac
+
+# The per-model bar is the reason the group exists on a Fable-capable account,
+# so it must survive by wrapping and never be dropped to squeeze the group onto
+# one line. Regression: on a ~110-column laptop it vanished silently.
+echo "Mid widths keep the per-model bar (wrapping if need be):"
+for w in 105 110 116 120; do
+    out=$(render "$w" "$REPO" "Opus 5 (1M context)")
+    case "$out" in *"Fable"*"10%"*) ok "width $w: Fable still shown" ;;
+                   *) bad "width $w: Fable still shown" "$out" ;; esac
+done
 
 # The label must come from the payload, not be hardcoded.
 fixture <<JSON

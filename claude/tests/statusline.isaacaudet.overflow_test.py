@@ -31,7 +31,13 @@ EXTRA = {
     "on":  '"extra_usage":{"is_enabled":true,"monthly_limit":200000,'
            '"used_credits":123456,"utilization":62.0}',
 }
-CACHE = "/tmp/claude/statusline-usage-cache.json"
+# Throwaway cache directory, inherited by every rendered subprocess: the live
+# cache belongs to the running status line (~/.claude/statusline.sh symlinks to
+# the script under test) and a fixture written there would be shown as real
+# usage until it expired.
+CACHE_DIR = tempfile.mkdtemp()
+os.environ["STATUSLINE_CACHE_DIR"] = CACHE_DIR
+CACHE = os.path.join(CACHE_DIR, "statusline-usage-cache.json")
 FIXTURE = ('{"five_hour":{"utilization":5.0,"resets_at":"2026-08-27T15:40:00+00:00"},'
            '"seven_day":{"utilization":7.0,"resets_at":"2026-08-28T02:00:00+00:00"},%s,'
            '"limits":[{"kind":"weekly_scoped","percent":10,'
@@ -46,12 +52,6 @@ def main():
         ["jq", "-r", ".statusLine.padding // 0", os.path.expanduser("~/.claude/settings.json")],
         capture_output=True, text=True).stdout.strip() or 0)
     root = tempfile.mkdtemp()
-    # Back up the live usage cache. If there wasn't one, remove the fixture at
-    # the end rather than leaving it: the status line would treat it as a fresh
-    # response for up to an hour and report fabricated usage.
-    had_cache = os.path.exists(CACHE)
-    saved = open(CACHE, "rb").read() if had_cache else None
-
     fails, checked = [], 0
     try:
       for cwd_name, extra_name in itertools.product(CWDS, EXTRA):
@@ -64,9 +64,9 @@ def main():
                         "commit", "-q", "--allow-empty", "-m", "i"], check=True)
         for br in BRANCHES:
               subprocess.run(["git", "-C", repo, "checkout", "-q", "-B", br], capture_output=True)
-              for f in os.listdir("/tmp/claude"):
+              for f in os.listdir(CACHE_DIR):
                   if f.startswith("git-"):
-                      os.remove("/tmp/claude/" + f)
+                      os.remove(os.path.join(CACHE_DIR, f))
               for model, cols in itertools.product(MODELS, WIDTHS):
                   stdin = ('{"model":{"display_name":"%s"},"cwd":"%s",'
                            '"cost":{"total_cost_usd":8.31},"context_window":'
@@ -89,11 +89,7 @@ def main():
                       fails.append(tag + (f"max {mx} > usable {usable}",))
     finally:
         shutil.rmtree(root, ignore_errors=True)
-        if saved is not None:
-            with open(CACHE, "wb") as fh:
-                fh.write(saved)
-        elif os.path.exists(CACHE):
-            os.remove(CACHE)
+        shutil.rmtree(CACHE_DIR, ignore_errors=True)
 
     print(f"checked {checked} combinations "
           f"(widths {WIDTHS.start}-{WIDTHS.stop - 1}, {len(BRANCHES)} branches, "

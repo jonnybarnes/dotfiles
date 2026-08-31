@@ -4,8 +4,9 @@
 # Usage: claude/tests/run.sh
 #
 # The tests render the status line directly, so they need the same tools it
-# does (bash, jq, git, python3). They briefly replace the cached usage-API
-# response in /tmp/claude with fixtures and restore it on exit.
+# does (bash, jq, git, python3). They point STATUSLINE_CACHE_DIR at a temporary
+# directory and write their fixtures there, so the caches the live status line
+# reads are never touched.
 cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
 
 status=0
