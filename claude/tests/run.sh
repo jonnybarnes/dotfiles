@@ -13,6 +13,7 @@ status=0
 for t in statusline.isaacaudet.payload_test.sh \
          statusline.isaacaudet.thinking_test.sh \
          statusline.isaacaudet.width_test.sh \
+         statusline.isaacaudet.pace_test.sh \
          statusline.isaacaudet.cache_test.sh; do
     echo "== $t"
     bash "$t" || status=1
