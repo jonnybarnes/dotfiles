@@ -1,6 +1,13 @@
 vim.pack.add({ 'https://github.com/esmuellert/codediff.nvim' })
 
 require('codediff').setup({
+  diff = {
+    -- Inline, GitHub-style: side-by-side is unreadable at laptop width. `t`
+    -- toggles back per session, `gc` toggles the folding.
+    layout = 'inline',
+    compact = true,
+    gutter_signs = true,
+  },
   keymaps = {
     -- q closes the diff tab from inside it; <leader>gc is here too so the
     -- same key that opened things from the g/diff group also shuts them.
