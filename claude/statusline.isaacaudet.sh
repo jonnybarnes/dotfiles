@@ -16,12 +16,13 @@ WRAP_MIN_WIDTH=100      # below this, keep wide-tier line-one content (it can wr
 BRANCH_MAX_LEN=28       # truncate branch names longer than this
 CWD_MAX_LEN=20          # truncate the cwd basename longer than this
 GIT_CACHE_SECS=10       # seconds to cache git status (git diff is slow on large repos)
+USAGE_CACHE_SECS=300    # seconds to cache the usage API response (the 5h/7d bars)
 TOKEN_BAR_WIDTH=8       # width of token progress bar
 
 # Where the git and usage-API caches live. Overridable via the environment so a
 # test run can render into its own directory: ~/.claude/statusline.sh is a
 # symlink to this script, so a fixture written to the live cache is picked up by
-# the next redraw and shown as real usage for up to an hour.
+# the next redraw and shown as real usage until USAGE_CACHE_SECS is up.
 CACHE_DIR="${STATUSLINE_CACHE_DIR:-/tmp/claude}"
 
 # Terminal width detection.
@@ -477,12 +478,11 @@ if [ -n "$cost_fmt" ] && [ "$width_tier" = "wide" -o "$width_tier" = "full" ]; t
     out+="${sep}${dim}\$${cost_fmt}${reset}"
 fi
 
-# ===== Rate limits (API, cached 60s) =====
+# ===== Rate limits (API, cached USAGE_CACHE_SECS) =====
 # Built at every tier except narrow. Which variant is actually emitted,
 # and on how many lines, is decided by the measured ladder at the end.
 if $SHOW_RATE_LIMITS && [ "$width_tier" != "narrow" ]; then
     api_cache="$CACHE_DIR/statusline-usage-cache.json"
-    api_cache_max=3600  # 1 hour — rate limit data changes slowly
     needs_refresh=true
     usage_data=""
 
@@ -490,7 +490,7 @@ if $SHOW_RATE_LIMITS && [ "$width_tier" != "narrow" ]; then
         cache_mtime=$(stat -c %Y "$api_cache" 2>/dev/null || stat -f %m "$api_cache" 2>/dev/null)
         now=$(date +%s)
         cache_age=$(( now - cache_mtime ))
-        if [ "$cache_age" -lt "$api_cache_max" ]; then
+        if [ "$cache_age" -lt "$USAGE_CACHE_SECS" ]; then
             cached_content=$(cat "$api_cache" 2>/dev/null)
             # Only use cache if it's valid data (not an error response)
             if [ -n "$cached_content" ] && ! echo "$cached_content" | jq -e '.error' >/dev/null 2>&1; then

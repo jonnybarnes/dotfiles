@@ -11,7 +11,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
 
 status=0
 for t in statusline.isaacaudet.payload_test.sh \
-         statusline.isaacaudet.width_test.sh; do
+         statusline.isaacaudet.width_test.sh \
+         statusline.isaacaudet.cache_test.sh; do
     echo "== $t"
     bash "$t" || status=1
     echo
