@@ -17,6 +17,7 @@ BRANCH_MAX_LEN=28       # truncate branch names longer than this
 CWD_MAX_LEN=20          # truncate the cwd basename longer than this
 GIT_CACHE_SECS=10       # seconds to cache git status (git diff is slow on large repos)
 USAGE_CACHE_SECS=300    # seconds to cache the usage API response (the 5h/7d bars)
+USAGE_RETRY_SECS=60     # seconds to wait before retrying a failed usage API fetch
 TOKEN_BAR_WIDTH=8       # width of token progress bar
 
 # Where the git and usage-API caches live. Overridable via the environment so a
@@ -483,6 +484,7 @@ fi
 # and on how many lines, is decided by the measured ladder at the end.
 if $SHOW_RATE_LIMITS && [ "$width_tier" != "narrow" ]; then
     api_cache="$CACHE_DIR/statusline-usage-cache.json"
+    fail_marker="$CACHE_DIR/statusline-usage-fail"
     needs_refresh=true
     usage_data=""
 
@@ -501,23 +503,53 @@ if $SHOW_RATE_LIMITS && [ "$width_tier" != "narrow" ]; then
     fi
 
     if $needs_refresh; then
-        token=$(get_oauth_token)
-        if [ -n "$token" ] && [ "$token" != "null" ]; then
-            response=$(curl -s --max-time 10 \
-                -H "Accept: application/json" \
-                -H "Content-Type: application/json" \
-                -H "Authorization: Bearer $token" \
-                -H "anthropic-beta: oauth-2025-04-20" \
-                -H "User-Agent: claude-code/2.1.34" \
-                "https://api.anthropic.com/api/oauth/usage" 2>/dev/null)
-            if [ -n "$response" ] && echo "$response" | jq . >/dev/null 2>&1; then
-                # Only cache successful (non-error) responses
-                if ! echo "$response" | jq -e '.error' >/dev/null 2>&1; then
-                    usage_data="$response"
-                    echo "$response" > "$api_cache"
+        # Hold off after a failed fetch. With no network curl can burn its
+        # --max-time before giving up, and a redraw happens on every keystroke,
+        # so retrying each time would stall the whole status line. The marker is
+        # separate from the cached response, rather than a touch of it: a cold
+        # /tmp has no response to touch, which is exactly when there is also no
+        # stale data to fall back on and the timeout is paid in full.
+        attempt=true
+        if [ -f "$fail_marker" ]; then
+            fail_mtime=$(stat -c %Y "$fail_marker" 2>/dev/null || stat -f %m "$fail_marker" 2>/dev/null)
+            [ $(( $(date +%s) - fail_mtime )) -lt "$USAGE_RETRY_SECS" ] && attempt=false
+        fi
+
+        if $attempt; then
+            token=$(get_oauth_token)
+            if [ -n "$token" ] && [ "$token" != "null" ]; then
+                # Marked before the call, cleared when it lands. A fetch is in
+                # flight for as long as curl takes to time out, and this cache
+                # dir is shared by every session, so redraws that start inside
+                # that window are real: they now serve stale data instead of
+                # each launching their own doomed request. Written on every
+                # attempt, so a repeated failure restarts the backoff, and only
+                # by an attempt, so the redraws it suppresses cannot keep
+                # re-stamping it and it always lapses.
+                #
+                # No credentials is not a failure worth suppressing: it costs no
+                # timeout, and the next redraw after a login should show the
+                # bars rather than wait out a retry window. Hence inside the
+                # token check.
+                : > "$fail_marker"
+                response=$(curl -s --max-time 10 \
+                    -H "Accept: application/json" \
+                    -H "Content-Type: application/json" \
+                    -H "Authorization: Bearer $token" \
+                    -H "anthropic-beta: oauth-2025-04-20" \
+                    -H "User-Agent: claude-code/2.1.34" \
+                    "https://api.anthropic.com/api/oauth/usage" 2>/dev/null)
+                if [ -n "$response" ] && echo "$response" | jq . >/dev/null 2>&1; then
+                    # Only cache successful (non-error) responses
+                    if ! echo "$response" | jq -e '.error' >/dev/null 2>&1; then
+                        usage_data="$response"
+                        echo "$response" > "$api_cache"
+                        rm -f "$fail_marker"
+                    fi
                 fi
             fi
         fi
+
         # Fall back to stale cache if refresh failed — skip if it's an error response
         if [ -z "$usage_data" ] && [ -f "$api_cache" ]; then
             stale=$(cat "$api_cache" 2>/dev/null)
