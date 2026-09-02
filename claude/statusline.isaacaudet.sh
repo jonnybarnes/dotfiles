@@ -38,16 +38,12 @@ CACHE_DIR="${STATUSLINE_CACHE_DIR:-/tmp/claude}"
 #
 # To override detection entirely, set TERM_WIDTH in settings.json:
 #   "command": "TERM_WIDTH=160 ~/.claude/statusline.sh"
-# Read both settings this script needs in one jq pass.
 # Only the user-level file: Claude Code also merges project .claude/settings.json,
 # .claude/settings.local.json and managed policy, so a statusLine.padding set at
 # project level would be applied by the renderer but missed here.
 sl_padding=0
-sl_thinking=false
 if [ -f "$HOME/.claude/settings.json" ]; then
-    { IFS= read -r sl_padding; IFS= read -r sl_thinking; } <<EOF
-$(jq -r '[(.statusLine.padding // 0), (.alwaysThinkingEnabled // false)] | .[] | tostring' "$HOME/.claude/settings.json" 2>/dev/null)
-EOF
+    sl_padding=$(jq -r '.statusLine.padding // 0' "$HOME/.claude/settings.json" 2>/dev/null)
     [ "${sl_padding:-0}" -ge 0 ] 2>/dev/null || sl_padding=0
 fi
 
@@ -321,8 +317,27 @@ used_tokens=$(format_tokens $current)
 total_tokens=$(format_tokens $size)
 pct_used=$(( size > 0 ? current * 100 / size : 0 ))
 
-thinking_on=false
-[ "$sl_thinking" = "true" ] && thinking_on=true
+# Thinking and effort come from the payload, not from alwaysThinkingEnabled in
+# settings.json: Option+T toggles thinking for the session only and never
+# writes the file, so a settings read reports the wrong state for the rest of
+# the session. Absent means enabled, mirroring Claude Code's own
+# `thinking:{enabled: lt !== false}`.
+# Both in one jq pass: the status line re-renders on every redraw, so a
+# process per field is the dominant cost (see the rate-limit section below).
+# `== false` rather than `// false`, which jq's falsy `//` would flip to true.
+{ IFS= read -r sl_thinking; IFS= read -r effort; } <<EOF
+$(echo "$input" | jq -r '(if .thinking.enabled == false then "false" else "true" end), (.effort.level // "")')
+EOF
+thinking_on=true
+[ "$sl_thinking" = "false" ] && thinking_on=false
+
+# The effort level replaces the static "thinking" label. Whitelisted rather
+# than printed as-is: an unrecognised value would escape the width budget that
+# the wrap branch computes from this string.
+case "$effort" in
+    low|medium|high|xhigh|max) thinking_label="$effort" ;;
+    *)                         thinking_label="thinking" ;;
+esac
 
 # ===== Adaptive width tiers =====
 #
@@ -331,8 +346,8 @@ thinking_on=false
 # the script, not here -- tiers cannot see how long the branch, cwd or model
 # name is, which is how content used to end up clipped.
 #
-#  full    (≥150): CWD, ahead/behind, "◆ thinking", cost
-#  wide    (100–149): ahead/behind, "◆ thinking", cost
+#  full    (≥150): CWD, ahead/behind, "◆ high" effort, cost
+#  wide    (100–149): ahead/behind, "◆ high" effort, cost
 #  split   (76–99):  short model, ahead/behind, "◆" symbol
 #                    (reachable only with WRAP_NARROW=false; otherwise the wrap
 #                     band below overrides this range to wide)
@@ -418,7 +433,7 @@ if $SHOW_GIT && [ -n "$cwd" ]; then
         [ "$width_tier" = "split"  ] && local_max=18
         [ "$width_tier" = "narrow" ] && local_max=12
         # In wrap mode line one is
-        #   model │ ⎇ branch ✔ ↑1 │ <bar> used/total pct% │ ◇ thinking │ $cost
+        #   model │ ⎇ branch ✔ ↑1 │ <bar> used/total pct% │ ◇ high │ $cost
         # and the branch gets whatever the rest of it leaves. Everything after
         # the branch is appended below, so its width is added up here rather
         # than assumed: a flat 56 columns was three short of a four-digit cost,
@@ -429,7 +444,7 @@ if $SHOW_GIT && [ -n "$cwd" ]; then
             [ "${g_behind:-0}" -gt 0 ] && tail_len=$(( tail_len + 2 + ${#g_behind} ))
             $SHOW_TOKENS && tail_len=$(( tail_len + 3 + bar_w + 1 \
                 + ${#used_tokens} + 1 + ${#total_tokens} + 1 + ${#pct_used} + 1 ))
-            $SHOW_THINKING && tail_len=$(( tail_len + 3 + 10 ))
+            $SHOW_THINKING && tail_len=$(( tail_len + 3 + 2 + ${#thinking_label} ))
             [ -n "$cost_fmt" ] && tail_len=$(( tail_len + 3 + 1 + ${#cost_fmt} ))
             local_max=$(( USABLE_WIDTH - $(vis_len "$out") - tail_len ))
             [ "$local_max" -lt 8  ] && local_max=8
@@ -459,18 +474,19 @@ if $SHOW_TOKENS; then
     out+="${sep}${token_bar} ${orange}${used_tokens}${dim}/${reset}${white}${total_tokens}${reset} ${dim}${pct_used}%${reset}"
 fi
 
-# Thinking:
-#   full/wide  → "◆ thinking" / "◇ thinking"  (label)
-#   split      → "◆" / "◇"                    (symbol only, saves ~9 chars)
+# Thinking and effort. The diamond is thinking state, the label is the effort
+# level ("thinking" only when the payload reports no level):
+#   full/wide  → "◆ high" / "◇ high"  (label)
+#   split      → "◆" / "◇"            (symbol only, saves the label's columns)
 #   narrow     → hidden
 if $SHOW_THINKING && [ "$width_tier" != "narrow" ]; then
     out+="${sep}"
     if $thinking_on; then
         if [ "$width_tier" = "split" ]; then out+="${amber}◆${reset}"
-        else out+="${amber}◆ thinking${reset}"; fi
+        else out+="${amber}◆ ${thinking_label}${reset}"; fi
     else
         if [ "$width_tier" = "split" ]; then out+="${dim}◇${reset}"
-        else out+="${dim}◇ thinking${reset}"; fi
+        else out+="${dim}◇ ${thinking_label}${reset}"; fi
     fi
 fi
 
