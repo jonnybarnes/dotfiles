@@ -20,7 +20,12 @@ SCRIPT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))
 BRANCHES = ["main", "feature/some-longer-branch-name",
             "feature/an-extremely-long-branch-name-that-keeps-going-and-going"]
 MODELS = ["Opus 5", "Opus 5 (1M context)"]
-WIDTHS = range(64, 245, 10)
+# Starts at the narrowest terminal line ONE fits on with the longest branch
+# below (measured: 44 usable columns, i.e. 49 with padding 2) -- the pre-existing
+# narrow-tier floor, which width_test.sh marks XFAIL. Everything above it is
+# fair game, and that now includes the band from RL_MIN_WIDTH up, where the
+# usage group is shown but has few columns to spare.
+WIDTHS = range(49, 245, 10)
 # The cwd basename is rendered at the widest layouts and is capped by
 # CWD_MAX_LEN; vary it, since a long project directory was one of the ways
 # line one used to overflow.

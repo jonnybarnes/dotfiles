@@ -54,10 +54,13 @@ check() { # usable, branch, model, cost, [xfail-reason]
     [ "$over" = "1" ] && why="line exceeds usable width"
     # INVARIANT 2: at most two lines
     [ "$n" -gt 2 ] && why="${why:-more than two lines}"
-    # INVARIANT 3: only wrap when it was actually necessary
-    if [ -z "$why" ] && [ "$n" = "2" ]; then
-        local l1 l2; l1=$(printf '%s\n' "$ws" | sed -n 1p); l2=$(printf '%s\n' "$ws" | sed -n 2p)
-        [ $(( l1 + 3 + l2 )) -le "$u" ] && why="wrapped unnecessarily (would have fit on one line)"
+    # INVARIANT 3: the usage group always gets a line of its own, so that the
+    # reset times and the pace figure have room whatever line one holds. Below
+    # RL_MIN_WIDTH there is no group to wrap, so a single line is expected.
+    if [ -z "$why" ]; then
+        if   [ "$u" -ge 35 ] && [ "$n" != "2" ]; then why="usage not on its own line"
+        elif [ "$u" -lt 35 ] && [ "$n" != "1" ]; then why="wrapped with no usage group"
+        fi
     fi
 
     local label="usable=$u branch=${#branch}ch model='${model:0:12}' lines=$n max=$mx"
@@ -75,7 +78,7 @@ M1="Opus 5"
 M2="Opus 5 (1M context)"
 
 echo "Sweep of usable widths, short branch:"
-for u in 200 155 150 130 116 110 100 95 85 75 68 67 60 40; do check "$u" "$SHORT" "$M1" 0.50; done
+for u in 200 155 150 130 116 110 100 95 85 75 68 67 60 50 40; do check "$u" "$SHORT" "$M1" 0.50; done
 # Narrow tier has a ~35-col floor; nothing can fit below that. Verified byte-identical
 # on the pre-change script, so not a regression.
 check 25 "$SHORT" "$M1" 0.50 "narrow tier floor ~35 cols"
@@ -86,7 +89,7 @@ for u in 200 150 116 100 85 68; do check "$u" "$LONG" "$M2" 4.61; done
 check 40 "$LONG" "$M2" 4.61 "narrow tier floor ~43 cols with a long branch"
 echo "Large cost figure:"
 for u in 116 85 68; do check "$u" "$SHORT" "$M1" 1234.56; done
-# ... and with a long branch, which is what makes the wrap-mode branch budget
+# ... and with a long branch, which is what makes the compact-tier branch budget
 # bite: a four-digit cost is three columns wider than the budget assumed.
 echo "Large cost figure with a long branch:"
 for u in 68 69 70 75 85; do check "$u" "$LONG" "$M1" 1234.56; done

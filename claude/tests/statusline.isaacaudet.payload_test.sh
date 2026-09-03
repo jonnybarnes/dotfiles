@@ -68,13 +68,25 @@ out=$(render 250)
 case "$out" in *"Fable"*"10%"*) ok "wide: renders 'Fable' with its percentage" ;;
                *) bad "wide: renders 'Fable' with its percentage" "$out" ;; esac
 
-# Wrapped: assert Fable is on line TWO specifically, not merely present.
-out=$(render 90)
-[ "$(count "$out")" = "2" ] && ok "narrow: wraps to two lines" || bad "narrow: wraps to two lines" "$out"
-case "$(nth "$out" 2)" in *"Fable"*"10%"*) ok "narrow: Fable is on line two" ;;
-                          *) bad "narrow: Fable is on line two" "$out" ;; esac
-case "$(nth "$out" 1)" in *"Fable"*) bad "narrow: Fable not duplicated on line one" "$out" ;;
-                          *) ok "narrow: Fable not duplicated on line one" ;; esac
+# The usage group always gets a line of its own, however wide the terminal is.
+for w in 250 116 90; do
+    out=$(render "$w")
+    [ "$(count "$out")" = "2" ] && ok "width $w: usage is on its own line" \
+                                || bad "width $w: usage is on its own line" "$out"
+    case "$(nth "$out" 2)" in *"Fable"*"10%"*) ok "width $w: Fable is on line two" ;;
+                              *) bad "width $w: Fable is on line two" "$out" ;; esac
+    case "$(nth "$out" 1)" in *"Fable"*) bad "width $w: Fable not duplicated on line one" "$out" ;;
+                              *) ok "width $w: Fable not duplicated on line one" ;; esac
+done
+
+# A line of its own is what buys room for the reset times: both the 5-hour
+# clock time and the 7-day date survive down to a laptop-sized terminal, where
+# they used to be the first thing given up.
+for w in 250 116 100; do
+    out=$(render "$w")
+    case "$(nth "$out" 2)" in *"↺"*"↺"*) ok "width $w: both reset times are shown" ;;
+                              *) bad "width $w: both reset times are shown" "$out" ;; esac
+done
 
 # The per-model bar is the reason the group exists on a Fable-capable account,
 # so it must survive by wrapping and never be dropped to squeeze the group onto
@@ -105,7 +117,7 @@ for desc in "no limits key:{$BASE,\"extra_usage\":{\"is_enabled\":false}}" \
     name="${desc%%:*}"; json="${desc#*:}"
     printf '%s' "$json" | fixture
     out=$(render 250)
-    if [ "$(count "$out")" = "1" ] && case "$out" in *"5h"*"7d"*) true;; *) false;; esac \
+    if [ "$(count "$out")" = "2" ] && case "$(nth "$out" 2)" in *"5h"*"7d"*) true;; *) false;; esac \
        && case "$out" in *error*|*null*|*"jq:"*|*"line "*) false;; *) true;; esac; then
         ok "$name"
     else bad "$name" "$out"; fi
@@ -139,33 +151,17 @@ fixture <<JSON
  "limits":[{"kind":"weekly_scoped","percent":10,"scope":{"model":{"display_name":"A\nB"}},"is_active":true}]}
 JSON
 out=$(render 250)
-[ "$(count "$out")" = "1" ] && ok "newline in display_name does not split the line" \
+[ "$(count "$out")" = "2" ] && ok "newline in display_name does not split the line" \
                             || bad "newline in display_name does not split the line" "$out"
 fixture <<JSON
 {$BASE,"extra_usage":{"is_enabled":false},"limits":[]}
 JSON
 mkdir -p "$REPO/sub"
 out=$(render 250 "$REPO/pro\\nj")
-[ "$(count "$out")" = "1" ] && ok "literal backslash-n in cwd does not split the line" \
+[ "$(count "$out")" = "2" ] && ok "literal backslash-n in cwd does not split the line" \
                             || bad "literal backslash-n in cwd does not split the line" "$out"
 out=$(render 250 "$REPO" 'Opus\n5')
-[ "$(count "$out")" = "1" ] && ok "literal backslash-n in model name does not split the line" \
+[ "$(count "$out")" = "2" ] && ok "literal backslash-n in model name does not split the line" \
                             || bad "literal backslash-n in model name does not split the line" "$out"
-
-# --------------------------------------------- WRAP_NARROW=false (regression §2)
-echo "With WRAP_NARROW=false the single line must still be fit-checked:"
-NOWRAP=$(mktemp); sed 's/^WRAP_NARROW=true/WRAP_NARROW=false/' "$SCRIPT" > "$NOWRAP"
-fixture <<JSON
-{$BASE,"extra_usage":{"is_enabled":false},
- "limits":[{"kind":"weekly_scoped","percent":10,"scope":{"model":{"display_name":"Fable"}},"is_active":true}]}
-JSON
-for w in 81 105 130; do
-    out=$(stdin_json "$REPO" "Opus 5" | TERM_WIDTH=$w bash "$NOWRAP" 2>&1 | sed $'s/\033\[[0-9;]*m//g')
-    u=$(( w - 5 )); c=$(vis "$out")
-    [ "$(count "$out")" = "1" ] && [ "$c" -le "$u" ] \
-        && ok "width $w: one line, $c <= usable $u" \
-        || bad "width $w: one line within usable $u (got $(count "$out") line/s, $c cols)" "$out"
-done
-rm -f "$NOWRAP"
 
 echo; echo "pass=$pass fail=$fail"; [ "$fail" -eq 0 ]

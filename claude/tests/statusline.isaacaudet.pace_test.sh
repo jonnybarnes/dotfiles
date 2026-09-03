@@ -214,8 +214,8 @@ import sys,re,unicodedata
 for ln in sys.stdin.read().rstrip('\n').split('\n'):
     p=re.sub(r'\033\[[0-9;]*m','',ln)
     print(sum(2 if unicodedata.east_asian_width(c) in 'WF' else 1 for c in p))"; }
-over=0; toomany=0; orphan=0; dropped=0; shown=0
-for u in 200 180 160 155 150 145 140 135 130 125 120 116 110 105 100 95 90 85 80 75 70 68; do
+over=0; toomany=0; orphan=0; dropped=0; shown=0; missing_wide=0
+for u in 200 180 160 155 150 145 140 135 130 125 120 116 110 105 100 95 90 85 80 75 70 68 60 55 50 45 40; do
     o=$(render "$MON" 12345 "$u")
     ws=$(printf '%s' "$o" | widths)
     while read -r c; do [ "$c" -gt "$u" ] && over=1; done <<< "$ws"
@@ -224,13 +224,18 @@ for u in 200 180 160 155 150 145 140 135 130 125 120 116 110 105 100 95 90 85 80
     # be the last thing standing.
     case "$o" in
         *"%/d"*) shown=1; case "$o" in *Fable*) ;; *) orphan=1 ;; esac ;;
-        *)       case "$o" in *Fable*) dropped=1 ;; esac ;;
+        *)       case "$o" in *Fable*) dropped=1 ;; esac
+                 [ "$u" -ge 68 ] && missing_wide=1 ;;
     esac
 done
 [ "$over"    = 0 ] && ok "no line exceeds the usable width at any width" || bad "no line exceeds the usable width at any width"
 [ "$toomany" = 0 ] && ok "never more than two lines"                     || bad "never more than two lines"
 [ "$orphan"  = 0 ] && ok "pace never outlives the per-model bar"         || bad "pace never outlives the per-model bar"
 [ "$shown"   = 1 ] && ok "pace is actually rendered somewhere in the sweep" || bad "pace is actually rendered somewhere in the sweep"
+# Line two is the group's own, so pace survives every width that fits a normal
+# status line -- it is only given up on a genuinely tiny terminal.
+[ "$missing_wide" = 0 ] && ok "pace is kept at every width from 68 columns up" \
+                        || bad "pace is kept at every width from 68 columns up"
 [ "$dropped" = 1 ] && ok "the pace rung is reachable: some width keeps the bar but drops pace" \
                    || bad "the pace rung is reachable: some width keeps the bar but drops pace"
 
@@ -238,7 +243,7 @@ done
 # readout, pace is the number this segment exists for, so the credits go first.
 fixture 7.0 "$R_MON_ISO" "$(scoped 0 null)" "$EXTRA_ON"
 pace_alone=0; credits_alone=0
-for u in 200 180 160 155 150 145 140 135 130 125 120 116 110 105 100 95 90 85 80 75 70 68; do
+for u in 200 180 160 155 150 145 140 135 130 125 120 116 110 105 100 95 90 85 80 75 70 68 60 55 50 45 40; do
     o=$(render "$MON" 12345 "$u")
     case "$o" in
         *"%/d"*) case "$o" in *extra*) ;; *) pace_alone=1 ;; esac ;;

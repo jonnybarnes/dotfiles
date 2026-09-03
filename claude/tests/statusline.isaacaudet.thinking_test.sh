@@ -82,8 +82,10 @@ echo "Fallbacks and tiers:"
 has  true  ""     "◆ thinking" 200 "absent effort falls back to the old label"
 has  true  garbage "◆ thinking" 200 "an unrecognised level falls back rather than widening the line"
 has  true  high    "◆ high"     120 "the label survives the wide tier"
-# The split tier (76-99) is unreachable while WRAP_NARROW=true -- that band is
-# overridden to wide and wrapped -- so only narrow is asserted here.
+# Below 68 columns the narrow tier drops the segment entirely; between there
+# and 100 the compact tier keeps the label, since the usage group has moved off
+# line one and left room for it.
+has  true  high    "◆ high"     85  "the label survives the compact tier"
 lacks true  high   "◆"           60  "narrow tier hides the segment"
 
 echo

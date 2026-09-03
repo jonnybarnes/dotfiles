@@ -11,8 +11,9 @@ SHOW_TOKENS=true        # token usage bar
 SHOW_THINKING=true      # extended thinking indicator
 SHOW_RATE_LIMITS=true   # 5h / 7d rate limit bars
 SHOW_MODEL_LIMIT=true   # per-model weekly limit bar (e.g. Fable), when the API reports one
-WRAP_NARROW=true        # wrap onto a second line rather than dropping segments or being clipped
-WRAP_MIN_WIDTH=100      # below this, keep wide-tier line-one content (it can wrap)
+RL_MIN_WIDTH=35         # narrowest usable width the 5h + 7d bars fit on their own
+                        # line: two of "5h ██████ 100%" plus a separator, +4
+COMPACT_WIDTH=100       # below this, shorten line one to what it has room for
 BRANCH_MAX_LEN=28       # truncate branch names longer than this
 CWD_MAX_LEN=20          # truncate the cwd basename longer than this
 GIT_CACHE_SECS=10       # seconds to cache git status (git diff is slow on large repos)
@@ -338,8 +339,8 @@ format_reset_time() {
 model_name=$(echo "$input" | jq -r '.model.display_name // "Claude"')
 cwd=$(echo "$input"        | jq -r '.cwd // empty')
 cost_usd=$(echo "$input"   | jq -r '.cost.total_cost_usd // empty')
-# Formatted here rather than where it is rendered: the wrap-mode branch budget
-# needs its width, and it is not fixed ("$4.61" vs "$1234.56").
+# Formatted here rather than where it is rendered: the compact-tier branch
+# budget needs its width, and it is not fixed ("$4.61" vs "$1234.56").
 cost_fmt=""
 [ -n "$cost_usd" ] && cost_fmt=$(printf '%.2f' "$cost_usd" 2>/dev/null)
 
@@ -370,8 +371,8 @@ thinking_on=true
 [ "$sl_thinking" = "false" ] && thinking_on=false
 
 # The effort level replaces the static "thinking" label. Whitelisted rather
-# than printed as-is: an unrecognised value would escape the width budget that
-# the wrap branch computes from this string.
+# than printed as-is: an unrecognised value would escape the width budget the
+# compact tier computes from this string.
 case "$effort" in
     low|medium|high|xhigh|max) thinking_label="$effort" ;;
     *)                         thinking_label="thinking" ;;
@@ -379,36 +380,28 @@ esac
 
 # ===== Adaptive width tiers =====
 #
-# Tiers now choose only how much of LINE ONE to show. What the rate-limit
-# group contains, and whether it wraps, is decided by measurement at the end of
-# the script, not here -- tiers cannot see how long the branch, cwd or model
-# name is, which is how content used to end up clipped.
+# The rate-limit group always gets line two to itself, so tiers choose only how
+# much of LINE ONE to show. What that group contains is decided by measurement
+# at the end of the script, not here -- tiers cannot see how long the branch,
+# cwd or model name is, which is how content used to end up clipped.
 #
 #  full    (≥150): CWD, ahead/behind, "◆ high" effort, cost
-#  wide    (100–149): ahead/behind, "◆ high" effort, cost
-#  split   (76–99):  short model, ahead/behind, "◆" symbol
-#                    (reachable only with WRAP_NARROW=false; otherwise the wrap
-#                     band below overrides this range to wide)
-#  narrow  (<76):  short model + branch + token only; no rate limits at all
+#  wide    (68–149): the same without the CWD, and below COMPACT_WIDTH with a
+#                    short model name and a branch budgeted to what is left
+#  narrow  (<68): short model + branch + token bar only -- the usage group is
+#                 unaffected, it has its own line at every width
 #
 if   [ "$USABLE_WIDTH" -ge 150 ] 2>/dev/null; then width_tier="full"
-elif [ "$USABLE_WIDTH" -ge 100 ] 2>/dev/null; then width_tier="wide"
-elif [ "$USABLE_WIDTH" -ge 76  ] 2>/dev/null; then width_tier="split"
+elif [ "$USABLE_WIDTH" -ge 68  ] 2>/dev/null; then width_tier="wide"
 else                                              width_tier="narrow"
 fi
 
-# Two-line mode. Between WRAP_FLOOR and WRAP_MIN_WIDTH there isn't room for
-# everything on one line, but there IS room across two — so instead of dropping
-# the rate-limit group we break before it and render the wide-tier content.
-# Below WRAP_FLOOR the narrow tier applies instead, which drops the rate-limit
-# group entirely -- so there is nothing to wrap and no second line to put it on.
-WRAP_FLOOR=68
-wrap_mode=false
-if $WRAP_NARROW \
-   && [ "$USABLE_WIDTH" -lt "$WRAP_MIN_WIDTH" ] 2>/dev/null \
-   && [ "$USABLE_WIDTH" -ge "$WRAP_FLOOR" ] 2>/dev/null; then
-    wrap_mode=true
-    width_tier="wide"
+# Compact: the wide tier with a short model name and the branch cut to whatever
+# line one has left. Between 68 and COMPACT_WIDTH columns the wide-tier
+# segments do fit, but only once those two are budgeted rather than assumed.
+compact=false
+if [ "$width_tier" = "wide" ] && [ "$USABLE_WIDTH" -lt "$COMPACT_WIDTH" ] 2>/dev/null; then
+    compact=true
 fi
 
 # Shorten model name for tight spaces
@@ -428,8 +421,9 @@ out=""
 rl_bare=""
 rl_lean=""
 rl_pace=""
-rl_mid=""
+rl_time=""
 rl_rich=""
+pace_len=""
 
 # Model — color by family
 model_color="$blue"
@@ -439,10 +433,9 @@ case "$model_name" in
 esac
 
 display_model="$model_name"
-# split/narrow: shorten so the 5h + 7d bars still fit on one line.
-# wrap mode too: it renders wide-tier content at a split-tier width, and a long
-# display name ("Opus 5 (1M context)" is 19 cols) would overflow line one.
-if [ "$width_tier" = "split" -o "$width_tier" = "narrow" ] || $wrap_mode; then
+# A long display name ("Opus 5 (1M context)" is 19 cols) would overflow line
+# one at these widths, so it gives up everything but the family.
+if [ "$width_tier" = "narrow" ] || $compact; then
     display_model=$(short_model "$model_name")
 fi
 out+="${model_color}$(esc_data "$display_model")${reset}"
@@ -457,7 +450,6 @@ fi
 
 bar_w="$TOKEN_BAR_WIDTH"
 [ "$width_tier" = "wide"   ] && bar_w=6
-[ "$width_tier" = "split"  ] && bar_w=5
 [ "$width_tier" = "narrow" ] && bar_w=4
 
 # Git branch + dirty + ahead/behind
@@ -469,15 +461,14 @@ if $SHOW_GIT && [ -n "$cwd" ]; then
         # Progressively tighten branch truncation
         local_max="$BRANCH_MAX_LEN"
         [ "$width_tier" = "wide"   ] && local_max=24
-        [ "$width_tier" = "split"  ] && local_max=18
         [ "$width_tier" = "narrow" ] && local_max=12
-        # In wrap mode line one is
+        # In compact mode line one is
         #   model │ ⎇ branch ✔ ↑1 │ <bar> used/total pct% │ ◇ high │ $cost
         # and the branch gets whatever the rest of it leaves. Everything after
         # the branch is appended below, so its width is added up here rather
         # than assumed: a flat 56 columns was three short of a four-digit cost,
         # which pushed line one past the edge to be clipped by the renderer.
-        if $wrap_mode; then
+        if $compact; then
             tail_len=$(( 5 + 2 ))                  # "│ ⎇ " and the dirty mark
             [ "${g_ahead:-0}"  -gt 0 ] && tail_len=$(( tail_len + 2 + ${#g_ahead} ))
             [ "${g_behind:-0}" -gt 0 ] && tail_len=$(( tail_len + 2 + ${#g_behind} ))
@@ -514,18 +505,12 @@ if $SHOW_TOKENS; then
 fi
 
 # Thinking and effort. The diamond is thinking state, the label is the effort
-# level ("thinking" only when the payload reports no level):
-#   full/wide  → "◆ high" / "◇ high"  (label)
-#   split      → "◆" / "◇"            (symbol only, saves the label's columns)
-#   narrow     → hidden
+# level ("thinking" only when the payload reports no level). Hidden at the
+# narrow tier, where line one has no columns to spare.
 if $SHOW_THINKING && [ "$width_tier" != "narrow" ]; then
     out+="${sep}"
-    if $thinking_on; then
-        if [ "$width_tier" = "split" ]; then out+="${amber}◆${reset}"
-        else out+="${amber}◆ ${thinking_label}${reset}"; fi
-    else
-        if [ "$width_tier" = "split" ]; then out+="${dim}◇${reset}"
-        else out+="${dim}◇ ${thinking_label}${reset}"; fi
+    if $thinking_on; then out+="${amber}◆ ${thinking_label}${reset}"
+    else                  out+="${dim}◇ ${thinking_label}${reset}"
     fi
 fi
 
@@ -535,9 +520,10 @@ if [ -n "$cost_fmt" ] && [ "$width_tier" = "wide" -o "$width_tier" = "full" ]; t
 fi
 
 # ===== Rate limits (API, cached USAGE_CACHE_SECS) =====
-# Built at every tier except narrow. Which variant is actually emitted,
-# and on how many lines, is decided by the measured ladder at the end.
-if $SHOW_RATE_LIMITS && [ "$width_tier" != "narrow" ]; then
+# Always rendered on a line of its own; which variant is emitted is decided by
+# the measured ladder at the end. Skipped below RL_MIN_WIDTH, where not even
+# the two bars fit on that line -- and skipping it also means no API call.
+if $SHOW_RATE_LIMITS && [ "$USABLE_WIDTH" -ge "$RL_MIN_WIDTH" ] 2>/dev/null; then
     api_cache="$CACHE_DIR/statusline-usage-cache.json"
     fail_marker="$CACHE_DIR/statusline-usage-fail"
     needs_refresh=true
@@ -614,7 +600,6 @@ if $SHOW_RATE_LIMITS && [ "$width_tier" != "narrow" ]; then
 
     if [ -n "$usage_data" ] && echo "$usage_data" | jq -e . >/dev/null 2>&1; then
         bar_width=6
-        [ "$width_tier" = "split" ] && bar_width=4
 
         # One jq pass for the whole payload. Parsing it field by field meant
         # ~10 jq processes per render on the same JSON; the status line runs on
@@ -754,14 +739,16 @@ EOF
             fi
         fi
 
-        # Four variants of the rate-limit group, richest first:
-        #   rl_rich  bars + reset times + pace + extra usage
-        #   rl_mid   bars + pace + extra usage
+        # Five nested variants of the rate-limit group, each rung giving up the
+        # least useful thing left:
+        #   rl_rich  bars + pace + reset times + extra usage
+        #   rl_time  bars + pace + reset times
         #   rl_pace  bars + pace
-        #   rl_lean  bars only
-        # The ladder at the end emits the richest one that fits the space it
-        # has. Keeping a lean variant matters: extra-usage credits add ~30
-        # columns, which can overflow line two on its own.
+        #   rl_lean  bars, per-model included
+        #   rl_bare  the 5h and 7d bars alone
+        # The ladder at the end emits the richest one that fits line two.
+        # Keeping the leaner rungs matters: extra-usage credits add ~30 columns
+        # and the two timestamps ~26, either of which can overflow the line.
         seg_5h="${dim}5h${reset} $(build_bar "${five_hour_pct:-0}" "$bar_width") ${cyan}${five_hour_pct:-0}%${reset}"
         seg_7d="${sep}${dim}7d${reset} $(build_bar "${seven_day_pct:-0}" "$bar_width") ${cyan}${seven_day_pct:-0}%${reset}"
 
@@ -780,8 +767,7 @@ EOF
         fi
 
         # rl_bare drops the per-model bar too: the last thing worth giving up,
-        # and the only way to fit at all when wrapping is disabled and the
-        # terminal is narrow.
+        # and all that fits on a terminal barely wider than the two bars.
         #
         # rl_pace is its own rung so pace is given up BEFORE the per-model bar
         # it annotates: a bar with no pace still says something, a pace with no
@@ -790,59 +776,55 @@ EOF
         rl_bare="${seg_5h}${seg_7d}"
         rl_lean="${rl_bare}${seg_scoped}"
         rl_pace="${rl_lean}${seg_pace}"
-        rl_mid="${rl_pace}${seg_extra}"
-        rl_rich="$rl_mid"
 
-        # Formatting the two reset timestamps costs ~10 subprocesses (date has
-        # no portable one-shot form here), so only pay for it when there is a
-        # chance they will be shown: appended to line one, or alone on line two.
-        # RESET_COST is the combined width of " reset 4:40p.m." and
-        # " reset aug 28, 3:00a.m.".
-        line1_len=$(vis_len "$out")
-        mid_len=$(vis_len "$rl_mid")
-        RESET_COST=30
-        if [ $(( line1_len + 3 + mid_len + RESET_COST )) -le "$USABLE_WIDTH" ] \
-           || { $WRAP_NARROW && [ $(( mid_len + RESET_COST )) -le "$USABLE_WIDTH" ]; }; then
+        # rl_time interleaves rather than appends: the 5h timestamp sits with
+        # its own bar, and the 7d one closes the weekly group it shares with
+        # the per-model bar and the pace.
+        #
+        # Formatting the pair costs ~10 subprocesses (date has no portable
+        # one-shot form here) on a line that redraws per keystroke, so it is
+        # skipped when line two provably cannot show them. RESET_COST
+        # deliberately UNDER-estimates their combined width -- " ↺ 1:00am" and
+        # " ↺ may 4, 1:00am" at their shortest -- so the ladder below, which
+        # measures the real string, stays the thing that decides.
+        RESET_COST=25
+        pace_len=$(vis_len "$rl_pace")
+        rl_time="$rl_pace"
+        if [ $(( pace_len + RESET_COST )) -le "$USABLE_WIDTH" ]; then
             five_hour_reset=$(format_reset_time "$five_hour_reset_iso" "time")
             seven_day_reset=$(format_reset_time "$seven_day_reset_iso" "datetime")
-            r5=""; [ -n "$five_hour_reset" ]  && r5=" ${dim}↺ ${five_hour_reset}${reset}"
+            r5=""; [ -n "$five_hour_reset" ] && r5=" ${dim}↺ ${five_hour_reset}${reset}"
             r7=""; [ -n "$seven_day_reset" ] && r7=" ${dim}↺ ${seven_day_reset}${reset}"
-            rl_rich="${seg_5h}${r5}${seg_7d}${seg_scoped}${seg_pace}${r7}${seg_extra}"
+            rl_time="${seg_5h}${r5}${seg_7d}${seg_scoped}${seg_pace}${r7}"
         fi
+        rl_rich="${rl_time}${seg_extra}"
     fi
 fi
 
-# Attach the rate-limit group, emitting the richest layout that fits.
+# Attach the rate-limit group on a line of its own, emitting the richest
+# variant that fits it.
 #
-# A second line is worth it for the per-model bar and nothing else: rl_bare is
-# the only variant that drops that bar, and it is the whole reason the group is
-# worth showing on an account that has one. Reset times and extra-usage credits
-# are given up instead of wrapped for, so content is NOT monotone in width -- at
-# one column narrower, rung 3 stops fitting and the wrap that follows has room
-# for the timestamps as well. Only wrapping being switched off makes rl_bare the
-# answer.
-#   1-4. one line:  with resets / with extra usage / with pace / bars + per-model
-#   5-8. two lines: same order, line two having room the single line lacked
-#   9.   one line, bars only -- WRAP_NARROW=false, the least-bad single line
-# Every branch is fit-checked, so no layout is chosen that would be clipped by
-# the renderer, whatever the branch name, cwd, model name or extra-usage width.
+# Line two is never shared with line one's segments, however wide the terminal
+# is. Squeezing the group onto line one is what used to cost the reset times
+# and the pace figure on a laptop-width window, and it made the layout jump
+# between one and two lines as the branch name or the cost changed width.
+# A full line to itself is worth more than the columns it wastes.
+#
+# The extra-usage credits ride on the richest rung alone, so an account with
+# overage enabled sees them only on a terminal wide enough for the whole group
+# -- around 110 columns. Below that the reset times win the space: they are the
+# number you act on, the credits the one you read afterwards.
+#
+# Every rung is fit-checked, the last one included, so nothing is chosen that
+# the renderer would clip, whatever the model name, the extra-usage width or
+# the percentages the API reports. If not even the two bars fit, the group is
+# dropped rather than overflowed.
 if [ -n "$rl_bare" ]; then
-    rich_len=$(vis_len "$rl_rich")
-    pace_len=$(vis_len "$rl_pace")
-    lean_len=$(vis_len "$rl_lean")
-    if   [ $(( line1_len + 3 + rich_len )) -le "$USABLE_WIDTH" ]; then out+="${sep}${rl_rich}"
-    elif [ $(( line1_len + 3 + mid_len  )) -le "$USABLE_WIDTH" ]; then out+="${sep}${rl_mid}"
-    elif [ $(( line1_len + 3 + pace_len )) -le "$USABLE_WIDTH" ]; then out+="${sep}${rl_pace}"
-    elif [ $(( line1_len + 3 + lean_len )) -le "$USABLE_WIDTH" ]; then out+="${sep}${rl_lean}"
-    elif $WRAP_NARROW; then
-        if   [ "$rich_len" -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_rich"
-        elif [ "$mid_len"  -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_mid"
-        elif [ "$pace_len" -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_pace"
-        elif [ "$lean_len" -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_lean"
-        else                                          out+=$'\n'"$rl_bare"
-        fi
-    else
-        out+="${sep}${rl_bare}"
+    if   [ "$(vis_len "$rl_rich")" -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_rich"
+    elif [ "$(vis_len "$rl_time")" -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_time"
+    elif [ "$pace_len"             -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_pace"
+    elif [ "$(vis_len "$rl_lean")" -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_lean"
+    elif [ "$(vis_len "$rl_bare")" -le "$USABLE_WIDTH" ]; then out+=$'\n'"$rl_bare"
     fi
 fi
 

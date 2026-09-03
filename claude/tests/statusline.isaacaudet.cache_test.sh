@@ -124,13 +124,13 @@ out=$(render 245)
                      || bad "30min old: refetched, not held for the hour" "$out"
 
 # ------------------------------------------------- bars shown => bars refreshed
-# The refresh is gated on the same tier check as the bars themselves, so the
-# two must agree at every width: wrapped onto line two included, and 68 being
-# WRAP_FLOOR, the narrowest width that still shows them.
+# The refresh is gated on the same width check as the bars themselves, so the
+# two must agree at every width, 35 being RL_MIN_WIDTH -- the narrowest usable
+# width the bars still fit on their own line.
 echo
 echo "Every width that shows the bars refreshes them:"
 
-for u in 245 115 85 68; do
+for u in 245 115 85 68 50 35; do
     cached_response_aged 360
     out=$(render "$u")
     if case "$out" in *"5h"*) true ;; *) false ;; esac; then
@@ -141,14 +141,14 @@ for u in 245 115 85 68; do
     fi
 done
 
-# One column below the wrap floor the group is dropped entirely — nothing is
+# One column below RL_MIN_WIDTH the group is dropped entirely — nothing is
 # shown, so nothing should be paid for either.
 cached_response_aged 360
-out=$(render 67)
-case "$out" in *"5h"*) bad "usable 67: no bars at the narrow tier" "$out" ;;
-               *) ok "usable 67: no bars at the narrow tier" ;; esac
-[ "$(calls)" = "0" ] && ok "usable 67: no API call when no bars are shown" \
-                     || bad "usable 67: no API call when no bars are shown" "$out"
+out=$(render 34)
+case "$out" in *"5h"*) bad "usable 34: no bars below the group's floor" "$out" ;;
+               *) ok "usable 34: no bars below the group's floor" ;; esac
+[ "$(calls)" = "0" ] && ok "usable 34: no API call when no bars are shown" \
+                     || bad "usable 34: no API call when no bars are shown" "$out"
 
 # --------------------------------------------------------- offline retry backoff
 # With no network, curl can burn --max-time 10 before giving up. A failed fetch
