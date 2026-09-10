@@ -2,8 +2,9 @@
 
 # Bring the default branch up to date in a fork-model repo, and keep my fork's
 # copy of it aligned: fast-forward it from whichever remote owns it, then push
-# it to origin. Named git-sync and installed on the $PATH, so git finds it as
-# `git sync`.
+# it to origin. Then do the same, without checking anything out, for every
+# other branch the fork mirrors from upstream. Named git-sync and installed on
+# the $PATH, so git finds it as `git sync`.
 
 set -e
 
@@ -62,6 +63,37 @@ fi
 # something to look at, not something to paper over.
 git merge --ff-only $source_remote/$branch
 
-if [[ $source_remote != origin ]]; then
-    git push origin $branch
+if [[ $source_remote == origin ]]; then
+    exit 0
+fi
+
+git push origin $branch
+
+# Every branch that exists on both remotes is one the fork mirrors (release
+# branches, demo branches), so keep those current too. Branches only on
+# upstream are colleagues' work, not mine to copy. Nothing is checked out here:
+# origin is updated straight from upstream's ref, and a local copy is
+# fast-forwarded in place if there is one.
+git fetch --prune origin
+
+refspecs=()
+for other in $(git for-each-ref --format='%(refname:strip=3)' refs/remotes/$source_remote/); do
+    [[ $other == $branch || $other == HEAD ]] && continue
+    git show-ref --verify --quiet refs/remotes/origin/$other || continue
+
+    if git merge-base --is-ancestor origin/$other $source_remote/$other; then
+        # Fast-forward a local copy too, but leave one with local commits
+        # alone: that is my in-progress work, not drift.
+        if git show-ref --verify --quiet refs/heads/$other &&
+           git merge-base --is-ancestor $other $source_remote/$other; then
+            git fetch . $source_remote/${other}:refs/heads/$other
+        fi
+        refspecs+=("$source_remote/${other}:refs/heads/$other")
+    else
+        echo "git sync: skipping $other - origin has diverged from $source_remote" >&2
+    fi
+done
+
+if (( ${#refspecs} )); then
+    git push origin "${refspecs[@]}"
 fi
