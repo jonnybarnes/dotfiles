@@ -112,6 +112,11 @@ if (( ${+commands[sheldon]} )); then
   unset sheldon_cache sheldon_toml sheldon_lock
 fi
 
+# Atuin shell history (self-hosted sync: atuin.jonnybarnes.uk)
+if (( ${+commands[atuin]} )); then
+  eval "$(atuin init zsh)"
+fi
+
 # Set the prompt
 # We need zsh git integration
 # Autoload zsh's `add-zsh-hook` and `vcs_info` functions

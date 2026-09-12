@@ -92,10 +92,6 @@ hooks.post = "fi"
 github = "ajeetdsouza/zoxide"
 apply = ["defer"]
 
-[plugins.mcfly]
-github = "cantino/mcfly"
-apply = ["defer"]
-
 [plugins.zsh-ssh]
 github = 'sunlei/zsh-ssh'
 apply = ["defer"]

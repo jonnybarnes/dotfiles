@@ -30,6 +30,7 @@ brew install zsh
 # Install other useful utilities
 brew install ack
 brew install age
+brew install atuin
 brew install awscli
 brew install b3sum
 brew install bat
@@ -48,7 +49,6 @@ brew install gnupg
 brew install hexyl
 brew install jq
 brew install lazygit
-brew install mcfly
 brew install neovim
 brew install p7zip
 brew install pcre
