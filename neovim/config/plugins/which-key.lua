@@ -10,5 +10,6 @@ wk.add({
   { '<leader>f', group = 'find' },
   { '<leader>g', group = 'diff' },
   { '<leader>h', group = 'hunks' },
+  { '<leader>r', group = 'review' },
   { '<leader>t', group = 'toggles' },
 })
