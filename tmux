@@ -55,6 +55,13 @@ set-hook -g client-dark-theme 'source-file ~/.tmux-dark.conf'
 # client attaches. Sourcing is idempotent, so the overlap is harmless.
 set-hook -g client-attached 'if -F "#{==:#{client_theme},light}" "source-file ~/.tmux-light.conf" "source-file ~/.tmux-dark.conf"'
 
+# The push from ghostty is lost when the appearance switches while the lid is
+# closed, so the bar wakes up in yesterday's colours. Re-ask the terminal
+# (DSR 996) whenever the window regains focus; ghostty answers with the
+# current theme and tmux treats the reply exactly like a pushed change, so
+# the two hooks above do the rest.
+set-hook -g client-focus-in 'run-shell -b "printf \"\\033[?996n\" > #{client_tty}"'
+
 # Default before any client has attached and reported a theme. This also
 # runs on manual reload (`r` below), so check the invoking client's theme
 # rather than always falling back to dark and clobbering a light session.

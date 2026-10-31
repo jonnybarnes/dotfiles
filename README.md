@@ -105,11 +105,15 @@ Most of this is now handled natively and needs no configuration:
 The tmux status bar needs help, because its colours are set explicitly. They live
 in `tmux-light.conf` and `tmux-dark.conf` — the same layout, with each colour
 taken from the matching tangere palette index — and `tmux` sources one of them
-from three hooks:
+from four hooks:
 
 - `client-light-theme` / `client-dark-theme` react to a change,
 - `client-attached` picks the right one for a client that attaches mid-way, since
-  the two above only fire on a change.
+  the two above only fire on a change,
+- `client-focus-in` re-asks the terminal for its theme (DSR 996). Ghostty's
+  push is lost when Auto switches while the lid is closed, so the bar would
+  otherwise wake up in yesterday's colours. The reply is handled exactly like
+  a pushed change, so the first two hooks do the rest.
 
 Because this keys off the terminal's reported theme rather than a schedule, it
 behaves identically whether the change came from Auto at sunrise/sunset or from
