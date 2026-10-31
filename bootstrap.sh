@@ -45,6 +45,8 @@ test -d $HOME/.config/nvim/lua || mkdir -p $HOME/.config/nvim/lua
 test -L $HOME/.config/nvim/lua/config || ln -f -s $BASEDIR/neovim/config $HOME/.config/nvim/lua/config
 test -d $HOME/.config/nvim/lsp || mkdir -p $HOME/.config/nvim/lsp
 test -L $HOME/.config/nvim/lsp/phpactor.lua || ln -f -s $BASEDIR/neovim/lsp/phpactor.lua $HOME/.config/nvim/lsp/phpactor.lua
+test -d $HOME/.config/nvim/after || mkdir -p $HOME/.config/nvim/after
+test -L $HOME/.config/nvim/after/ftplugin || ln -f -s $BASEDIR/neovim/after/ftplugin $HOME/.config/nvim/after/ftplugin
 
 # Claude Code statusline
 test -d $HOME/.claude || mkdir $HOME/.claude
