@@ -26,6 +26,13 @@ if (( ${+commands[ghostty]} )); then
   test -L $HOME/.config/ghostty/themes/tangere-light.conf || ln -f -s $BASEDIR/ghostty/themes/tangere-light $HOME/.config/ghostty/themes/tangere-light.conf
 fi
 
+# If Rex is installed then link its config. Its CLI is only on PATH inside
+# Rex's own shells, so look for the app bundle instead
+if ls -d /Applications/Rex*.app >/dev/null 2>&1; then
+  test -d $HOME/.config/rex || mkdir $HOME/.config/rex
+  test -L $HOME/.config/rex/init.lua || ln -f -s $BASEDIR/rex/init.lua $HOME/.config/rex/init.lua
+fi
+
 # setup gpg conf
 test -d $HOME/.gnupg || mkdir $HOME/.gnupg
 cp -f $BASEDIR/gnupg/common.conf $HOME/.gnupg/common.conf
