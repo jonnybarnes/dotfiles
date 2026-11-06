@@ -3,8 +3,9 @@
 # rex.sh
 # Apply the Rex terminal settings that live in macOS defaults rather than in
 # init.lua: the tangere light/dark themes (imported from the ghostty theme
-# files), the font and copy-on-select. Run it with Rex quit, otherwise Rex
-# overwrites the values with its in-memory copy when it next saves.
+# files), the font, copy-on-select and the interface preferences. Run it with
+# Rex quit, otherwise Rex overwrites the values with its in-memory copy when it
+# next saves.
 
 if pgrep -xq Rex; then
   echo "Quit Rex before running this script"
@@ -32,3 +33,14 @@ defaults write $DOMAIN Workspace.lightThemeID -string custom-82BA2A60-D9EA-4808-
 defaults write $DOMAIN Workspace.terminalFontName -string "Hack Nerd Font Mono"
 defaults write $DOMAIN Workspace.terminalFontPointSize -float 18
 defaults write $DOMAIN Workspace.terminalCopyOnSelect -bool true
+
+# Interface preferences, as set in Settings on the MacBook
+defaults write $DOMAIN Workspace.interfaceStyle -string blendTheme
+defaults write $DOMAIN Workspace.paneDensity -string compact
+defaults write $DOMAIN Workspace.tabStyle -string horizontal
+defaults write $DOMAIN Workspace.tabIconTintMode -string off
+defaults write $DOMAIN Workspace.sidebarPosition -string right
+defaults write $DOMAIN Workspace.inactivePaneFadeMode -string both
+defaults write $DOMAIN Workspace.usesStandardInactiveWindowPaneStyles -bool true
+defaults write $DOMAIN Workspace.usesPaneGlass -bool false
+defaults write $DOMAIN rex.agents.names-sessions -bool true
