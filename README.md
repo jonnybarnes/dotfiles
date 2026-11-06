@@ -25,6 +25,9 @@ First clone the repo.
 Run `./bootstrap.sh`, this will create all the necessary symlinks, then source
 `.zshrc`.
 
+If Rex is installed, quit it and run `./rex/rex.sh` to apply its theme and font
+settings, which live in macOS defaults rather than in a linked file.
+
 > [!WARNING]
 > This is a **destructive** process, so backup your dotfiles first.
 
@@ -97,6 +100,9 @@ Most of this is now handled natively and needs no configuration:
 
 - **ghostty** follows the system appearance itself via
   `theme = light:tangere-light.conf,dark:tangere-dark.conf`.
+- **Rex** does the same once `rex/rex.sh` has written the tangere themes,
+  font and copy-on-select into its defaults. Keybinds live in `rex/init.lua`,
+  which `bootstrap.sh` links.
 - **tmux** 3.6+ learns the terminal’s theme over OSC 2031 and exposes it as
   `#{client_theme}`.
 - **bat** picks a theme per invocation from `BAT_THEME_LIGHT` / `BAT_THEME_DARK`.
