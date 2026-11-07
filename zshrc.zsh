@@ -129,6 +129,21 @@ setopt prompt_subst
 # Run the `vcs_info` hook to grab git info before displaying the prompt
 add-zsh-hook precmd vcs_info
 
+# Set the terminal title ourselves over ssh. Rex titles a tab from the
+# foreground process, but across ssh it misses a command exiting, so the tab
+# stays stuck on the last one (`/usr/bin/eza on minas-tirith`). A title a
+# program sets wins over Rex's, so set it at each prompt and for each command.
+# Only over ssh: locally Rex sees processes directly, and its own titles are
+# better. Not inside tmux either, which ignores them anyway (allow-rename off).
+if [[ -n $SSH_TTY && -z $TMUX ]]; then
+  _title_precmd() { print -Pn '\e]2;zsh %~\a' }
+  # The command as typed. (V) makes control characters visible, so a pasted
+  # escape cannot end the title early; % is left alone since this is print -r.
+  _title_preexec() { print -rn -- $'\e]2;'"${(V)1[1,80]}"$'\a' }
+  add-zsh-hook precmd _title_precmd
+  add-zsh-hook preexec _title_preexec
+fi
+
 # Style the vcs_info message
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git*' formats '⎇ %b'
