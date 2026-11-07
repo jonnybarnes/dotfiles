@@ -33,6 +33,13 @@ Update with `:lua vim.pack.update()`. Versions are pinned in
 `nvim-pack-lock.json`, which is tracked — commit it after an update so the other
 machine gets the same set.
 
+On the other machine, `vim.pack` installs any plugin that is missing, but it
+leaves an installed plugin on its old revision when a pulled lockfile has moved
+it. `bin/nvim-pack-sync` puts those back on the locked revision, and
+`bootstrap.sh` registers it as a `post-merge` hook on this repo, so `git pull`
+runs it. Run `nvim-pack-sync --check` to see what has drifted without changing
+anything.
+
 > [!NOTE]
 > nvim-web-devicons needs a Nerd Font in the terminal or the icons render as
 > tofu. `brew.sh` installs one for ghostty.

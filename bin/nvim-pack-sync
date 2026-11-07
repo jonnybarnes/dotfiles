@@ -1,0 +1,61 @@
+#!/usr/bin/env zsh
+
+# Bring the plugins vim.pack has on disk in line with nvim-pack-lock.json.
+#
+# vim.pack installs a plugin that is missing, but a pulled lockfile that moves
+# an already-installed plugin to another revision is left alone: nvim keeps
+# running the old checkout until someone runs vim.pack.update() by hand. This
+# compares each plugin's checked-out revision with the lockfile and, if any
+# differ, has a headless nvim move them to the lockfile's revision.
+#
+# Runs as a post-merge hook on the dotfiles repo (bootstrap.sh registers it), so
+# a `git pull` that brings in a new lockfile sorts the plugins out too.
+#
+#   nvim-pack-sync          check, and fix anything out of line
+#   nvim-pack-sync --check  report only; exits 1 if anything is out of line
+
+set -e
+
+check_only=false
+[[ $1 == --check ]] && check_only=true
+
+lockfile=${XDG_CONFIG_HOME:-$HOME/.config}/nvim/nvim-pack-lock.json
+packdir=${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/pack/core/opt
+
+if [[ ! -r $lockfile ]]; then
+    echo "nvim-pack-sync: no lockfile at $lockfile" >&2
+    exit 1
+fi
+
+drifted=()
+missing=()
+for name rev in $(jq -r '.plugins | to_entries[] | "\(.key) \(.value.rev)"' $lockfile); do
+    if [[ ! -d $packdir/$name ]]; then
+        missing+=($name)
+    elif [[ $(git -C $packdir/$name rev-parse HEAD) != $rev ]]; then
+        drifted+=($name)
+    fi
+done
+
+if (( ! ${#drifted} && ! ${#missing} )); then
+    $check_only && echo "nvim plugins match the lockfile"
+    exit 0
+fi
+
+(( ${#drifted} )) && echo "nvim plugins not at their locked revision: ${drifted[*]}"
+(( ${#missing} )) && echo "nvim plugins not installed: ${missing[*]}"
+$check_only && exit 1
+
+# Starting nvim with the real config installs the missing plugins, since every
+# plugin file calls vim.pack.add(). Then move the drifted ones to the lockfile's
+# revision, without the confirmation buffer that a headless nvim cannot answer.
+names='{'
+for name in $drifted; do names+="'$name',"; done
+names+='}'
+echo "Syncing nvim plugins to the lockfile"
+nvim --headless \
+    -c "lua local n = $names; if #n > 0 then vim.pack.update(n, { target = 'lockfile', force = true }) end" \
+    -c 'qa'
+echo
+
+exec $0 --check

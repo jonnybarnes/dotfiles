@@ -55,6 +55,13 @@ test -L $HOME/.config/nvim/lsp/phpactor.lua || ln -f -s $BASEDIR/neovim/lsp/phpa
 test -d $HOME/.config/nvim/after || mkdir -p $HOME/.config/nvim/after
 test -L $HOME/.config/nvim/after/ftplugin || ln -f -s $BASEDIR/neovim/after/ftplugin $HOME/.config/nvim/after/ftplugin
 
+# vim.pack leaves an installed plugin alone when a pulled lockfile moves it, so
+# have every pull into this repo bring the plugins into line. A config-defined
+# hook (git 2.54+) rather than a file in .git/hooks, so it is one idempotent
+# command here. Written to the repo's own config: it is meaningless elsewhere.
+git -C $BASEDIR config set hook.nvim-pack-sync.event post-merge
+git -C $BASEDIR config set hook.nvim-pack-sync.command $BASEDIR/bin/nvim-pack-sync
+
 # Claude Code statusline
 test -d $HOME/.claude || mkdir $HOME/.claude
 ln -f -s $BASEDIR/claude/statusline.isaacaudet.sh $HOME/.claude/statusline.sh
