@@ -24,7 +24,7 @@ map('<leader>gh', '<Cmd>CodeDiff history %<CR>', 'File history')
 map('<leader>gH', '<Cmd>CodeDiff history<CR>', 'Branch history')
 
 -- A remote's cached HEAD, or nil if it has none. Kept current by
--- remote.origin.followRemoteHEAD in the gitconfig and by `git sync`; without
+-- fetch.followRemoteHEAD in the gitconfig and by `git sync`; without
 -- those this is whatever the default branch was at clone time.
 local function remote_head(remote)
   local prefix = 'refs/remotes/' .. remote .. '/'

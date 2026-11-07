@@ -89,11 +89,11 @@ doing so. `git remote` sorts alphabetically, so picking the first remote in
 be-edition returns `kdog` — a colleague's fork. nvim's `<leader>gm`
 (diff-against-branch) tries `origin`, then `upstream`, then the rest.
 
-One wrinkle: setting `remote.origin.followRemoteHEAD` at all is enough for git to
-invent the remote, so `git remote` lists a URL-less `origin` in repos that have
-none — this one, whose remotes are `forge` and `github`. It is a listing
-artefact, not a real remote: `git remote get-url origin` still fails, so the
-`origin` guard in `git sync` and the fallbacks in `<leader>gm` behave.
+It is set as `fetch.followRemoteHEAD`, covering every remote, rather than as
+`remote.origin.followRemoteHEAD`. Setting any `remote.origin.*` key is enough for
+git to invent the remote, so the per-remote form gave repos with no `origin` —
+this one, whose remotes are `forge` and `github` — a URL-less one that `git fetch
+--all` then failed on.
 
 ## Light and dark mode
 
