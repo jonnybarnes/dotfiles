@@ -94,4 +94,29 @@ for u in 116 85 68; do check "$u" "$SHORT" "$M1" 1234.56; done
 echo "Large cost figure with a long branch:"
 for u in 68 69 70 75 85; do check "$u" "$LONG" "$M1" 1234.56; done
 
+# Line one's head (model name, cwd) is chosen by measurement, not by tier: the
+# full name and the directory are shown whenever they fit beside the branch.
+line1() { # usable, branch, model -> line one with the colours stripped
+    git -C "$REPO" checkout -q -B "$2" 2>/dev/null; rm -f "$STATUSLINE_CACHE_DIR"/git-*
+    TERM_WIDTH=$(( $1 + OVERHEAD )) bash "$SCRIPT" <<<"{\"model\":{\"display_name\":\"$3\"},\"cwd\":\"$REPO\",\"cost\":{\"total_cost_usd\":0.5},\"context_window\":{\"context_window_size\":200000,\"current_usage\":{\"input_tokens\":45000,\"cache_read_input_tokens\":30000}}}" \
+        | sed -n 1p | sed $'s/\033\[[0-9;]*m//g'
+}
+expect() { # description, line, pattern it must match, [pattern it must not]
+    local ok=1
+    case "$2" in $3) ;; *) ok=0 ;; esac
+    [ -n "${4:-}" ] && case "$2" in $4) ok=0 ;; esac
+    if [ "$ok" = 1 ]; then echo "  PASS  $1"; pass=$((pass+1))
+    else echo "  FAIL  $1"; echo "          $2"; fail=$((fail+1)); fi
+}
+DIR=${REPO##*/}
+M3="Fable 5.2"
+
+echo "Model name and cwd fill whatever room line one has:"
+expect "usable=95: full model name and cwd when they fit" \
+    "$(line1 95 "$SHORT" "$M3")" "Fable 5.2 │ $DIR │ *"
+expect "usable=95, long branch: cwd gives way before the model name" \
+    "$(line1 95 "$LONG" "$M3")" "Fable 5.2 │ ⎇ *" "*$DIR*"
+expect "usable=68, long branch: model falls back to its family, not its version" \
+    "$(line1 68 "$LONG" "$M3")" "Fable │ ⎇ *" "*$DIR*"
+
 echo; echo "pass=$pass fail=$fail"; [ "$fail" -eq 0 ]

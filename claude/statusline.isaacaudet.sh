@@ -13,7 +13,7 @@ SHOW_RATE_LIMITS=true   # 5h / 7d rate limit bars
 SHOW_MODEL_LIMIT=true   # per-model weekly limit bar (e.g. Fable), when the API reports one
 RL_MIN_WIDTH=35         # narrowest usable width the 5h + 7d bars fit on their own
                         # line: two of "5h ██████ 100%" plus a separator, +4
-COMPACT_WIDTH=100       # below this, shorten line one to what it has room for
+COMPACT_WIDTH=100       # below this, cut the branch to what line one has room for
 BRANCH_MAX_LEN=28       # truncate branch names longer than this
 CWD_MAX_LEN=20          # truncate the cwd basename longer than this
 GIT_CACHE_SECS=10       # seconds to cache git status (git diff is slow on large repos)
@@ -339,8 +339,8 @@ format_reset_time() {
 model_name=$(echo "$input" | jq -r '.model.display_name // "Claude"')
 cwd=$(echo "$input"        | jq -r '.cwd // empty')
 cost_usd=$(echo "$input"   | jq -r '.cost.total_cost_usd // empty')
-# Formatted here rather than where it is rendered: the compact-tier branch
-# budget needs its width, and it is not fixed ("$4.61" vs "$1234.56").
+# Formatted here rather than where it is rendered: the line-one width budget
+# needs its width, and it is not fixed ("$4.61" vs "$1234.56").
 cost_fmt=""
 [ -n "$cost_usd" ] && cost_fmt=$(printf '%.2f' "$cost_usd" 2>/dev/null)
 
@@ -371,8 +371,8 @@ thinking_on=true
 [ "$sl_thinking" = "false" ] && thinking_on=false
 
 # The effort level replaces the static "thinking" label. Whitelisted rather
-# than printed as-is: an unrecognised value would escape the width budget the
-# compact tier computes from this string.
+# than printed as-is: an unrecognised value would escape the width budget
+# line one computes from this string.
 case "$effort" in
     low|medium|high|xhigh|max) thinking_label="$effort" ;;
     *)                         thinking_label="thinking" ;;
@@ -383,12 +383,14 @@ esac
 # The rate-limit group always gets line two to itself, so tiers choose only how
 # much of LINE ONE to show. What that group contains is decided by measurement
 # at the end of the script, not here -- tiers cannot see how long the branch,
-# cwd or model name is, which is how content used to end up clipped.
+# cwd or model name is, which is how content used to end up clipped. For the
+# same reason the model name and the CWD are not tiered either: they are
+# measured against what the rest of line one leaves, further down.
 #
-#  full    (≥150): CWD, ahead/behind, "◆ high" effort, cost
-#  wide    (68–149): the same without the CWD, and below COMPACT_WIDTH with a
-#                    short model name and a branch budgeted to what is left
-#  narrow  (<68): short model + branch + token bar only -- the usage group is
+#  full    (≥150): ahead/behind, "◆ high" effort, cost
+#  wide    (68–149): the same with a shorter token bar and branch cap, and
+#                    below COMPACT_WIDTH with the branch budgeted to what is left
+#  narrow  (<68): model + branch + token bar only -- the usage group is
 #                 unaffected, it has its own line at every width
 #
 if   [ "$USABLE_WIDTH" -ge 150 ] 2>/dev/null; then width_tier="full"
@@ -396,9 +398,9 @@ elif [ "$USABLE_WIDTH" -ge 68  ] 2>/dev/null; then width_tier="wide"
 else                                              width_tier="narrow"
 fi
 
-# Compact: the wide tier with a short model name and the branch cut to whatever
-# line one has left. Between 68 and COMPACT_WIDTH columns the wide-tier
-# segments do fit, but only once those two are budgeted rather than assumed.
+# Compact: the wide tier with the branch cut to whatever line one has left.
+# Between 68 and COMPACT_WIDTH columns the wide-tier segments do fit, but only
+# once the branch is budgeted rather than assumed.
 compact=false
 if [ "$width_tier" = "wide" ] && [ "$USABLE_WIDTH" -lt "$COMPACT_WIDTH" ] 2>/dev/null; then
     compact=true
@@ -410,7 +412,7 @@ short_model() {
         *Opus*)   echo "Opus" ;;
         *Sonnet*) echo "Sonnet" ;;
         *Haiku*)  echo "Haiku" ;;
-        *)        echo "$1" | awk '{print $NF}' ;;   # last word
+        *)        echo "${1%% *}" ;;                 # first word: "Fable 5.2" -> "Fable"
     esac
 }
 
@@ -432,69 +434,85 @@ case "$model_name" in
     *Haiku*) model_color="$cyan"  ;;
 esac
 
-display_model="$model_name"
-# A long display name ("Opus 5 (1M context)" is 19 cols) would overflow line
-# one at these widths, so it gives up everything but the family.
-if [ "$width_tier" = "narrow" ] || $compact; then
-    display_model=$(short_model "$model_name")
-fi
-out+="${model_color}$(esc_data "$display_model")${reset}"
-
-# CWD — full tier only (branch name gives enough context below that)
-if [ "$width_tier" = "full" ] && [ -n "$cwd" ]; then
-    # Capped like the branch name: nothing else shortens line one, so an
-    # unusually long project directory would push it past the terminal edge.
-    display_dir=$(truncate_str "${cwd##*/}" "$CWD_MAX_LEN")
-    out+="${sep}${dim}$(esc_data "$display_dir")${reset}"
-fi
-
 bar_w="$TOKEN_BAR_WIDTH"
 [ "$width_tier" = "wide"   ] && bar_w=6
 [ "$width_tier" = "narrow" ] && bar_w=4
 
-# Git branch + dirty + ahead/behind
+# Git info is fetched before anything is drawn: the model name and the CWD get
+# the room the branch leaves, so its length has to be known first.
+g_branch=""
 if $SHOW_GIT && [ -n "$cwd" ]; then
     git_info=$(get_git_info "$cwd")
-    if [ -n "$git_info" ]; then
-        IFS=$'\t' read -r g_branch g_dirty g_ahead g_behind <<< "$git_info"
+    [ -n "$git_info" ] && IFS=$'\t' read -r g_branch g_dirty g_ahead g_behind <<< "$git_info"
+fi
 
-        # Progressively tighten branch truncation
-        local_max="$BRANCH_MAX_LEN"
-        [ "$width_tier" = "wide"   ] && local_max=24
-        [ "$width_tier" = "narrow" ] && local_max=12
-        # In compact mode line one is
-        #   model │ ⎇ branch ✔ ↑1 │ <bar> used/total pct% │ ◇ high │ $cost
-        # and the branch gets whatever the rest of it leaves. Everything after
-        # the branch is appended below, so its width is added up here rather
-        # than assumed: a flat 56 columns was three short of a four-digit cost,
-        # which pushed line one past the edge to be clipped by the renderer.
-        if $compact; then
-            tail_len=$(( 5 + 2 ))                  # "│ ⎇ " and the dirty mark
-            [ "${g_ahead:-0}"  -gt 0 ] && tail_len=$(( tail_len + 2 + ${#g_ahead} ))
-            [ "${g_behind:-0}" -gt 0 ] && tail_len=$(( tail_len + 2 + ${#g_behind} ))
-            $SHOW_TOKENS && tail_len=$(( tail_len + 3 + bar_w + 1 \
-                + ${#used_tokens} + 1 + ${#total_tokens} + 1 + ${#pct_used} + 1 ))
-            $SHOW_THINKING && tail_len=$(( tail_len + 3 + 2 + ${#thinking_label} ))
-            [ -n "$cost_fmt" ] && tail_len=$(( tail_len + 3 + 1 + ${#cost_fmt} ))
-            local_max=$(( USABLE_WIDTH - $(vis_len "$out") - tail_len ))
-            [ "$local_max" -lt 8  ] && local_max=8
-            [ "$local_max" -gt 24 ] && local_max=24
-        fi
-        g_branch_display=$(truncate_str "$g_branch" "$local_max")
+# Progressively tighten branch truncation
+local_max="$BRANCH_MAX_LEN"
+[ "$width_tier" = "wide"   ] && local_max=24
+[ "$width_tier" = "narrow" ] && local_max=12
 
-        out+="${sep}${dim}⎇${reset} ${magenta}$(esc_data "$g_branch_display")${reset}"
+# Line one is
+#   model │ cwd │ ⎇ branch ✔ ↑1 │ <bar> used/total pct% │ ◇ high │ $cost
+# tail_len is the width of everything in it but the model, the cwd and the
+# branch name. Those segments are appended below, so their width is added up
+# here rather than assumed: a flat 56 columns was three short of a four-digit
+# cost, which pushed line one past the edge to be clipped by the renderer.
+tail_len=0
+if [ -n "$g_branch" ]; then
+    tail_len=$(( 5 + 2 ))                          # "│ ⎇ " and the dirty mark
+    if [ "$width_tier" != "narrow" ]; then
+        [ "${g_ahead:-0}"  -gt 0 ] && tail_len=$(( tail_len + 2 + ${#g_ahead} ))
+        [ "${g_behind:-0}" -gt 0 ] && tail_len=$(( tail_len + 2 + ${#g_behind} ))
+    fi
+fi
+$SHOW_TOKENS && tail_len=$(( tail_len + 3 + bar_w + 1 \
+    + ${#used_tokens} + 1 + ${#total_tokens} + 1 + ${#pct_used} + 1 ))
+if [ "$width_tier" != "narrow" ]; then
+    $SHOW_THINKING && tail_len=$(( tail_len + 3 + 2 + ${#thinking_label} ))
+    [ -n "$cost_fmt" ] && tail_len=$(( tail_len + 3 + 1 + ${#cost_fmt} ))
+fi
 
-        if [ "$g_dirty" = "dirty" ]; then
-            out+=" ${red}✗${reset}"
-        else
-            out+=" ${green}✔${reset}"
-        fi
+# The full model name and the CWD are shown when they fit beside the branch at
+# the length its tier allows. The CWD goes first, then the model name gives up
+# everything but the family ("Opus 5 (1M context)" is 19 cols); only after
+# that is the branch itself cut short.
+branch_len=${#g_branch}
+[ "$branch_len" -gt "$local_max" ] && branch_len=$local_max
+head_room=$(( USABLE_WIDTH - tail_len - branch_len ))
 
-        # Ahead/behind: shown in all tiers except narrow (only if non-zero)
-        if [ "$width_tier" != "narrow" ]; then
-            [ "${g_ahead:-0}"  -gt 0 ] && out+=" ${green}↑${g_ahead}${reset}"
-            [ "${g_behind:-0}" -gt 0 ] && out+=" ${orange}↓${g_behind}${reset}"
-        fi
+display_model="$model_name"
+# Capped like the branch name, so an unusually long project directory cannot
+# crowd out the model name.
+display_dir=$(truncate_str "${cwd##*/}" "$CWD_MAX_LEN")
+if [ -z "$display_dir" ] || [ $(( ${#display_model} + 3 + ${#display_dir} )) -gt "$head_room" ]; then
+    display_dir=""
+    [ "${#display_model}" -gt "$head_room" ] && display_model=$(short_model "$model_name")
+fi
+out+="${model_color}$(esc_data "$display_model")${reset}"
+[ -n "$display_dir" ] && out+="${sep}${dim}$(esc_data "$display_dir")${reset}"
+
+# Git branch + dirty + ahead/behind
+if [ -n "$g_branch" ]; then
+    # In compact mode the branch gets whatever the rest of line one leaves.
+    if $compact; then
+        local_max=$(( USABLE_WIDTH - $(vis_len "$out") - tail_len ))
+        [ "$local_max" -lt 8  ] && local_max=8
+        [ "$local_max" -gt 24 ] && local_max=24
+    fi
+    g_branch_display=$(truncate_str "$g_branch" "$local_max")
+
+    out+="${sep}${dim}⎇${reset} ${magenta}$(esc_data "$g_branch_display")${reset}"
+
+    if [ "$g_dirty" = "dirty" ]; then
+        out+=" ${red}✗${reset}"
+    else
+        out+=" ${green}✔${reset}"
+    fi
+
+    # Ahead/behind: shown in all tiers except narrow (only if non-zero)
+    if [ "$width_tier" != "narrow" ]; then
+        [ "${g_ahead:-0}"  -gt 0 ] && out+=" ${green}↑${g_ahead}${reset}"
+        [ "${g_behind:-0}" -gt 0 ] && out+=" ${orange}↓${g_behind}${reset}"
     fi
 fi
 
